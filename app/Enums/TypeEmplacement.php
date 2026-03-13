@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TypeEmplacement: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TypeEmplacement: string implements HasLabel
 {
     case SITE = 'site';
     case POINT_DE_VENTE = 'point_de_vente';
     case DEPOT = 'depot';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::SITE => 'Site',

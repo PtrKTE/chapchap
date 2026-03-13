@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum StatutFacture: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum StatutFacture: string implements HasLabel, HasColor
 {
     case NON_REGLEE = 'non_reglee';
     case PARTIELLE = 'partielle';
     case REGLEE = 'reglee';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::NON_REGLEE => 'Non réglée',
@@ -19,7 +22,7 @@ enum StatutFacture: string
         };
     }
 
-    public function color(): string
+    public function getColor(): string
     {
         return match ($this) {
             self::NON_REGLEE => 'danger',

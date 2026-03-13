@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum StatutTransfert: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum StatutTransfert: string implements HasLabel, HasColor
 {
     case EN_COURS = 'en_cours';
     case RECU = 'recu';
     case ANNULE = 'annule';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::EN_COURS => 'En cours',
@@ -19,7 +22,7 @@ enum StatutTransfert: string
         };
     }
 
-    public function color(): string
+    public function getColor(): string
     {
         return match ($this) {
             self::EN_COURS => 'warning',

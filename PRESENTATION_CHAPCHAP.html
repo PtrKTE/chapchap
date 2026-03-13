@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAPCHAP — Présentation Direction</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --orange: #f97316;
+            --orange-light: #fed7aa;
+            --orange-dark: #c2410c;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --gray: #64748b;
+            --light: #f8fafc;
+            --white: #ffffff;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --red: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--darker);
+            color: var(--dark);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* ===== SLIDES ===== */
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            padding: 60px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        .slide.active { display: flex; flex-direction: column; }
+
+        /* ===== NAVIGATION ===== */
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+        .nav button {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--orange);
+            background: rgba(255,255,255,0.95);
+            color: var(--orange);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .nav button:hover {
+            background: var(--orange);
+            color: white;
+        }
+        .counter {
+            position: fixed;
+            bottom: 38px;
+            left: 40px;
+            font-size: 14px;
+            color: var(--gray);
+            z-index: 100;
+            background: rgba(255,255,255,0.9);
+            padding: 6px 16px;
+            border-radius: 20px;
+        }
+        .progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 4px;
+            background: var(--orange);
+            transition: width 0.4s ease;
+            z-index: 100;
+        }
+
+        /* ===== SLIDE STYLES ===== */
+
+        /* Cover */
+        .slide-cover {
+            background: linear-gradient(135deg, var(--darker) 0%, #1a1a2e 50%, var(--orange-dark) 100%);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .slide-cover .logo {
+            font-size: 96px;
+            font-weight: 900;
+            letter-spacing: -3px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--orange) 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .slide-cover .subtitle {
+            font-size: 24px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 40px;
+        }
+        .slide-cover .meta {
+            font-size: 16px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Standard slides */
+        .slide-std {
+            background: var(--light);
+        }
+        .slide-std .slide-header {
+            margin-bottom: 40px;
+        }
+        .slide-std .slide-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--orange);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        .slide-std h2 {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.1;
+        }
+        .slide-std h2 span { color: var(--orange); }
+        .slide-std .content { flex: 1; display: flex; flex-direction: column; }
+
+        /* Dark slides */
+        .slide-dark {
+            background: linear-gradient(135deg, var(--darker) 0%, #1a1a2e 100%);
+            color: white;
+        }
+        .slide-dark .slide-number { color: var(--orange); }
+        .slide-dark h2 { color: white; }
+        .slide-dark h2 span { color: var(--orange); }
+
+        /* ===== COMPONENTS ===== */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex: 1; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; flex: 1; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; flex: 1; }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+        .card-dark {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 28px;
+        }
+        .card .icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        .card-dark h3 { color: white; }
+        .card p, .card li {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        .card-dark p { color: rgba(255,255,255,0.6); }
+        .card ul { list-style: none; padding: 0; }
+        .card li::before {
+            content: "→ ";
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .icon-orange { background: #fff7ed; color: var(--orange); }
+        .icon-green { background: #f0fdf4; color: var(--green); }
+        .icon-blue { background: #eff6ff; color: var(--blue); }
+        .icon-red { background: #fef2f2; color: var(--red); }
+        .icon-dark { background: rgba(249,115,22,0.15); color: var(--orange); }
+
+        .stat-big {
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--orange);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 15px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 2px 4px 2px 0;
+        }
+        .tag-orange { background: #fff7ed; color: var(--orange-dark); }
+        .tag-green { background: #f0fdf4; color: #15803d; }
+        .tag-blue { background: #eff6ff; color: #1d4ed8; }
+        .tag-gray { background: #f1f5f9; color: var(--gray); }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .timeline-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--orange);
+            flex-shrink: 0;
+        }
+        .timeline-dot.done { background: var(--green); }
+        .timeline-label {
+            font-size: 15px;
+            color: var(--dark);
+        }
+        .timeline-label strong { font-weight: 600; }
+
+        table.clean {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.clean th {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            padding: 10px 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        table.clean td {
+            padding: 12px 16px;
+            font-size: 15px;
+            color: var(--dark);
+            border-bottom: 1px solid #f1f5f9;
+        }
+        table.clean tr:last-child td { border-bottom: none; }
+        table.clean .highlight { color: var(--orange); font-weight: 700; }
+
+        .two-col {
+            display: flex;
+            gap: 50px;
+            flex: 1;
+            align-items: center;
+        }
+        .two-col .col { flex: 1; }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            font-size: 16px;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+        .feature-list .check {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #f0fdf4;
+            color: var(--green);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, var(--orange), #ea580c);
+            color: white;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+        }
+        .highlight-box h3 {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .highlight-box p {
+            color: rgba(255,255,255,0.8);
+            font-size: 16px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .badge-success { background: #f0fdf4; color: #15803d; }
+        .badge-warning { background: #fffbeb; color: #a16207; }
+
+        .footer-note {
+            font-size: 13px;
+            color: var(--gray);
+            text-align: center;
+            margin-top: auto;
+            padding-top: 20px;
+        }
+        .slide-dark .footer-note { color: rgba(255,255,255,0.3); }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide.active .animate {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .slide.active .animate:nth-child(2) { animation-delay: 0.1s; }
+        .slide.active .animate:nth-child(3) { animation-delay: 0.2s; }
+        .slide.active .animate:nth-child(4) { animation-delay: 0.3s; }
+
+        /* Print */
+        @media print {
+            .slide { display: flex !important; page-break-after: always; height: 100vh; }
+            .nav, .counter, .progress { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress" id="progress"></div>
+    <div class="counter" id="counter"></div>
+    <div class="nav">
+        <button onclick="prevSlide()">&#8592;</button>
+        <button onclick="nextSlide()">&#8594;</button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 1 : COUVERTURE -->
+    <!-- ============================================================ -->
+    <div class="slide slide-cover active" id="slide-1">
+        <div>
+            <div class="logo">CHAPCHAP</div>
+            <div class="subtitle">Application de Gestion Integree</div>
+            <p style="font-size:20px; color:rgba(255,255,255,0.5); margin-bottom: 50px;">
+                Abattage &bull; Decoupe &bull; Stock &bull; Ventes &bull; Tresorerie
+            </p>
+            <div class="meta">
+                Presentation Direction &bull; Fevrier 2026
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 2 : LE PROBLÈME -->
+    <!-- ============================================================ -->
+    <div class="slide slide-std" id="slide-2">
+        <div class="slide-header">
+            <div class="slide-number">Contexte</div>
+            <h2>Le <span>probleme</span> aujourd'hui</h2>
+        </div>
+        <div class="grid-2 content">
+            <div>
+                <div class="card" style="margin-bottom: 20px; border-left: 4px solid var(--red);">
+                    <h3>Suivi manuel et fragmente</h3>
+                    <ul>
+                        <li>Cahiers et fiches papier pour les lots, les ventes, la caisse</li>
+                        <li>Pas de visibilite en temps reel sur le stock</li>
+                        <li>Difficulte a suivre les impayes clients</li>
+                        <li>Aucun calcul automatique des marges</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--red);">
+                    <h3>Risques identifies</h3>
+                    <ul>
+                        <li>Ecarts de caisse non detectes</li>
+                        <li>Pertes de stock non tracees</li>
+                        <li>Credits clients oublies</li>
+                        <li>Pas de traçabilite des operations</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px;">
+                <div class="highlight-box">
+                    <h3>L'objectif</h3>
+                    <p>Une application unique et centralisee qui connecte toute la chaine : <strong>achats → production → stock → ventes → tresorerie</strong></p>
+                </div>
+                <div class="card">
+                    <h3>Les benefices attendus</h3>
+                    <ul>
+                        <li>Visibilite instantanee sur l'activite</li>
+                        <li>Calculs automatiques (stock, CMP, marges)</li>
+                        <li>Suivi des impayes et de la tresorerie</li>
+                        <li>Traçabilite complete de chaque operation</li>
+                        <li>Prise de decision basee sur les chiffres</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 3 : VUE D'ENSEMBLE -->
+    <!-- ============================================================ -->
+    <div class="slide slide-dark" id="slide-3">
+        <div class="slide-header">
+            <div class="slide-number">Vue d'ensemble</div>
+            <h2>CHAPCHAP en <span>chiffres</span></h2>
+        </div>
+        <div class="grid-4 content" style="align-items: start; margin-top: 20px;">
+            <div class="card-dark" style="text-align:center;">
+                <div class="stat-big">9</div>
+                <div class="stat-label">Modules metier</div>
+            </div>
+            <div class="card-dark" style="text-align:center;">
+                <div class="stat-big">23</div>
+                <div class="stat-label">Tables en base</div>
+            </div>
+            <div class="card-dark" style="text-align:center;">
+                <div class="stat-big">10</div>
+                <div class="stat-label">Widgets dashboard</div>
+            </div>
+            <div class="card-dark" style="text-align:center;">
+                <div class="stat-big">5</div>
+                <div class="stat-label">Profils utilisateur</div>
+            </div>
+        </div>
+        <div class="grid-3" style="margin-top: 30px;">
+            <div class="card-dark" style="text-align:center;">
+                <div class="stat-big" style="font-size:40px;">27</div>
+                <div class="stat-label">Tests automatises</div>
+                <span class="badge badge-success" style="margin-top:8px;">100% reussis</span>
+            </div>
+            <div class="card-dark" style="text-align:center;">
+                <div class="stat-big" style="font-size:40px;">6</div>
+                <div class="stat-label">Exports Excel</div>
+            </div>
+            <div class="card-dark" style="text-align:center;">
+                <div class="stat-big" style="font-size:40px;">2</div>
+                <div class="stat-label">Rapports PDF</div>
+            </div>
+        </div>
+        <div class="footer-note">Application web accessible depuis navigateur — compatible ordinateur, tablette et smartphone</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4 : FLUX MÉTIER -->
+    <!-- ============================================================ -->
+    <div class="slide slide-std" id="slide-4">
+        <div class="slide-header">
+            <div class="slide-number">Architecture metier</div>
+            <h2>Le flux <span>complet</span></h2>
+        </div>
+        <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+            <div style="width: 100%; max-width: 900px;">
+                <!-- Flux visuel -->
+                <div style="display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap: wrap;">
+                    <div style="background: #fef3c7; border:2px solid #f59e0b; border-radius:12px; padding:16px 24px; text-align:center; min-width:140px;">
+                        <div style="font-size:28px;">🐔</div>
+                        <div style="font-weight:700; font-size:14px; color:#92400e;">ACHATS</div>
+                        <div style="font-size:12px; color:#a16207;">Lots / Fournisseurs</div>
+                    </div>
+                    <div style="font-size:28px; color:var(--orange);">→</div>
+                    <div style="background: #fce7f3; border:2px solid #ec4899; border-radius:12px; padding:16px 24px; text-align:center; min-width:140px;">
+                        <div style="font-size:28px;">🔪</div>
+                        <div style="font-weight:700; font-size:14px; color:#9d174d;">PRODUCTION</div>
+                        <div style="font-size:12px; color:#be185d;">Abattage / Decoupe</div>
+                    </div>
+                    <div style="font-size:28px; color:var(--orange);">→</div>
+                    <div style="background: #ede9fe; border:2px solid #8b5cf6; border-radius:12px; padding:16px 24px; text-align:center; min-width:140px;">
+                        <div style="font-size:28px;">📦</div>
+                        <div style="font-weight:700; font-size:14px; color:#5b21b6;">STOCK</div>
+                        <div style="font-size:12px; color:#6d28d9;">Chambres froides</div>
+                    </div>
+                    <div style="font-size:28px; color:var(--orange);">→</div>
+                    <div style="background: #d1fae5; border:2px solid #10b981; border-radius:12px; padding:16px 24px; text-align:center; min-width:140px;">
+                        <div style="font-size:28px;">🛒</div>
+                        <div style="font-weight:700; font-size:14px; color:#065f46;">VENTES</div>
+                        <div style="font-size:12px; color:#047857;">Multi-canaux</div>
+                    </div>
+                    <div style="font-size:28px; color:var(--orange);">→</div>
+                    <div style="background: #fff7ed; border:2px solid var(--orange); border-radius:12px; padding:16px 24px; text-align:center; min-width:140px;">
+                        <div style="font-size:28px;">💰</div>
+                        <div style="font-weight:700; font-size:14px; color:var(--orange-dark);">CAISSE</div>
+                        <div style="font-size:12px; color:var(--orange);">Tresorerie</div>
+                    </div>
+                </div>
+
+                <!-- Détails sous le flux -->
+                <div style="margin-top: 40px; display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <h3 style="font-size:16px;">Automatisations cles</h3>
+                        <ul style="list-style:none; padding:0;">
+                            <li style="padding:4px 0; font-size:14px;">✅ Stock mis a jour automatiquement a chaque vente</li>
+                            <li style="padding:4px 0; font-size:14px;">✅ Cout Moyen Pondere (CMP) recalcule en temps reel</li>
+                            <li style="padding:4px 0; font-size:14px;">✅ Marges calculees automatiquement par produit</li>
+                            <li style="padding:4px 0; font-size:14px;">✅ Statut factures fournisseurs auto-actualise</li>
+                            <li style="padding:4px 0; font-size:14px;">✅ Journal d'audit sur chaque action</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 style="font-size:16px;">Transferts inter-sites</h3>
+                        <div style="text-align:center; padding: 10px 0;">
+                            <div style="display:inline-flex; align-items:center; gap:16px;">
+                                <div style="background:#eff6ff; padding:12px 20px; border-radius:10px;">
+                                    <div style="font-weight:700; font-size:14px;">🏭 Site principal</div>
+                                    <div style="font-size:12px; color:var(--gray);">Abattoir + Chambre froide</div>
+                                </div>
+                                <div style="font-size:24px; color:var(--orange);">⇄</div>
+                                <div style="background:#f0fdf4; padding:12px 20px; border-radius:10px;">
+                                    <div style="font-weight:700; font-size:14px;">🏪 Belleville</div>
+                                    <div style="font-size:12px; color:var(--gray);">Point de vente</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p style="font-size:13px; text-align:center; color:var(--gray);">Suivi des quantites envoyees vs recues, avec gestion des ecarts</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 : MODULES DÉTAILLÉS -->
+    <!-- ============================================================ -->
+    <div class="slide slide-std" id="slide-5">
+        <div class="slide-header">
+            <div class="slide-number">Modules</div>
+            <h2>Les <span>9 modules</span> de l'application</h2>
+        </div>
+        <div class="grid-3 content" style="align-items: start;">
+            <div class="card">
+                <div class="icon icon-orange">🐔</div>
+                <h3>Lots & Achats</h3>
+                <p>Reception des poulets vivants et oeufs, suivi des fournisseurs, calcul automatique du cout moyen unitaire, suivi des factures</p>
+            </div>
+            <div class="card">
+                <div class="icon" style="background:#fce7f3; color:#ec4899;">🔪</div>
+                <h3>Production</h3>
+                <p>Saisie de l'abattage et decoupe, suivi du rendement, pertes/casse, grille de rendement par poids de poulet</p>
+            </div>
+            <div class="card">
+                <div class="icon" style="background:#ede9fe; color:#8b5cf6;">📦</div>
+                <h3>Stock</h3>
+                <p>Stock temps reel par emplacement, CMP, alertes de stock bas, mouvements traces, inventaire physique</p>
+            </div>
+            <div class="card">
+                <div class="icon" style="background:#e0f2fe; color:#0284c7;">🚚</div>
+                <h3>Transferts</h3>
+                <p>Transfert de produits entre sites, suivi envoi/reception, gestion des ecarts de quantite</p>
+            </div>
+            <div class="card">
+                <div class="icon icon-green">🛒</div>
+                <h3>Ventes</h3>
+                <p>Vente multi-canaux (boutique, B2B, commercial, livraison), gestion credit, paiements partiels, recus PDF</p>
+            </div>
+            <div class="card">
+                <div class="icon icon-blue">👥</div>
+                <h3>Clients / CRM</h3>
+                <p>Fiche client complete, suivi par commercial, historique des achats, import Excel, impayes par client</p>
+            </div>
+            <div class="card">
+                <div class="icon" style="background:#fff7ed; color:var(--orange);">💰</div>
+                <h3>Caisse</h3>
+                <p>Journal de caisse quotidien, versements (especes, Wave, MTN, cheque), cloture avec ecart zero obligatoire</p>
+            </div>
+            <div class="card">
+                <div class="icon icon-red">📊</div>
+                <h3>Charges</h3>
+                <p>Suivi des depenses par categorie (carburant, electricite, loyer, salaires...), impact caisse automatique</p>
+            </div>
+            <div class="card">
+                <div class="icon" style="background:#ecfdf5; color:#059669;">💧</div>
+                <h3>Eau & Viande</h3>
+                <p>Modules complementaires : production d'eau en sachets, gestion de la viande bovine avec suivi separe</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 : DASHBOARD / KPIs -->
+    <!-- ============================================================ -->
+    <div class="slide slide-dark" id="slide-6">
+        <div class="slide-header">
+            <div class="slide-number">Tableau de bord</div>
+            <h2>Des <span>KPI en temps reel</span> pour chaque profil</h2>
+        </div>
+        <div class="grid-2 content" style="margin-top: 10px;">
+            <div>
+                <div class="card-dark" style="margin-bottom:16px;">
+                    <h3 style="color:var(--orange); font-size:16px; margin-bottom:12px;">👔 Vue Gerant</h3>
+                    <ul style="list-style:none; padding:0;">
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">📈 CA du jour / semaine / mois (avec tendance)</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">💹 Marge brute globale</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">📊 Evolution CA + marge sur 30 jours</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">🏆 Top 5 clients par CA</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">🍗 Top 5 produits vendus</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">⚠️ Impayes en cours et anciennete</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">💵 Tresorerie : encaissements vs decaissements</li>
+                    </ul>
+                </div>
+                <div class="card-dark">
+                    <h3 style="color:var(--orange); font-size:16px; margin-bottom:12px;">🏭 Vue Production</h3>
+                    <ul style="list-style:none; padding:0;">
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">🐔 Poulets traites (semaine / mois)</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">📏 Rendement moyen</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">⚠️ Pertes et casse</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="card-dark" style="margin-bottom:16px;">
+                    <h3 style="color:var(--orange); font-size:16px; margin-bottom:12px;">📦 Vue Stock</h3>
+                    <ul style="list-style:none; padding:0;">
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">📋 Stock total valorise par emplacement</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">🔴 Alertes de stock bas</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">📊 Repartition par categorie</li>
+                    </ul>
+                </div>
+                <div class="card-dark" style="margin-bottom:16px;">
+                    <h3 style="color:var(--orange); font-size:16px; margin-bottom:12px;">🛒 Vue Commercial</h3>
+                    <ul style="list-style:none; padding:0;">
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">💰 CA par commercial</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">📊 Nombre de ventes et clients actifs</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">⚠️ Impayes par commercial</li>
+                        <li style="padding:5px 0; color:rgba(255,255,255,0.7); font-size:14px;">🏆 Classement performance</li>
+                    </ul>
+                </div>
+                <div class="card-dark">
+                    <p style="color: rgba(255,255,255,0.5); font-size:14px; text-align:center; padding: 8px;">
+                        <strong style="color:var(--orange);">10 widgets</strong> au total — chaque profil ne voit que les donnees qui le concernent
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 : PRODUITS GÉRÉS -->
+    <!-- ============================================================ -->
+    <div class="slide slide-std" id="slide-7">
+        <div class="slide-header">
+            <div class="slide-number">Catalogue</div>
+            <h2>Les <span>17 produits</span> geres</h2>
+        </div>
+        <div class="grid-2 content" style="align-items: start;">
+            <div>
+                <div class="card" style="margin-bottom:16px;">
+                    <h3>🐔 Volaille entiere</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+                        <span class="tag tag-orange">Poulet effile</span>
+                        <span class="tag tag-orange">Poulet PAC</span>
+                        <span class="tag tag-orange">Coquelets</span>
+                        <span class="tag tag-orange">Poulets Morts</span>
+                    </div>
+                </div>
+                <div class="card" style="margin-bottom:16px;">
+                    <h3>🍗 Decoupes</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+                        <span class="tag tag-green">Escalopes — 3 800 F/kg</span>
+                        <span class="tag tag-green">Cuisses — 2 500 F/kg</span>
+                        <span class="tag tag-green">Ailes — 2 000 F/kg</span>
+                        <span class="tag tag-green">Carcasses — 1 000 F/kg</span>
+                        <span class="tag tag-green">Brochettes — 1 000 F/kg</span>
+                        <span class="tag tag-green">Assortiment</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>🫀 Abats</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+                        <span class="tag tag-blue">Gesiers</span>
+                        <span class="tag tag-blue">Foies</span>
+                        <span class="tag tag-blue">Pattes</span>
+                        <span class="tag tag-blue">Cous</span>
+                        <span class="tag tag-blue">Intestins</span>
+                        <span class="tag tag-blue">Peaux</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="margin-bottom:16px;">
+                    <h3>🥚 Oeufs & Autres</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+                        <span class="tag tag-gray">Oeufs — 2 200 F/unite</span>
+                    </div>
+                </div>
+                <div class="card" style="margin-bottom:16px;">
+                    <h3 style="font-size:16px;">Grille de rendement intégree</h3>
+                    <table class="clean" style="margin-top:10px;">
+                        <tr><th>Poids poulet</th><th>Valorisation</th></tr>
+                        <tr><td>1,8 kg</td><td class="highlight">4 149 FCFA</td></tr>
+                        <tr><td>2,0 kg</td><td class="highlight">4 311 FCFA</td></tr>
+                        <tr><td>2,3 kg</td><td class="highlight">5 075 FCFA</td></tr>
+                    </table>
+                    <p style="font-size:12px; color:var(--gray); margin-top:8px;">La grille de rendement permet de calculer la valeur theorique de chaque poulet en fonction de son poids</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size:16px;">Clients types geres</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+                        <span class="tag tag-orange">Restaurants</span>
+                        <span class="tag tag-orange">Maquis</span>
+                        <span class="tag tag-orange">Hotels</span>
+                        <span class="tag tag-orange">Supermarches</span>
+                        <span class="tag tag-green">SITA</span>
+                        <span class="tag tag-green">Casino Prima</span>
+                        <span class="tag tag-green">Hyper Hayat</span>
+                        <span class="tag tag-green">NORAL</span>
+                        <span class="tag tag-green">PROSUMA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 : SÉCURITÉ & PROFILS -->
+    <!-- ============================================================ -->
+    <div class="slide slide-std" id="slide-8">
+        <div class="slide-header">
+            <div class="slide-number">Securite</div>
+            <h2><span>5 profils</span> avec droits differencies</h2>
+        </div>
+        <div class="content" style="overflow:auto;">
+            <table class="clean" style="margin-bottom:24px;">
+                <thead>
+                    <tr>
+                        <th>Profil</th>
+                        <th>Perimetre</th>
+                        <th>Acces</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>👔 Gerant</strong></td>
+                        <td><span class="tag tag-orange">Global</span></td>
+                        <td>Vision complete, KPI, validation, exports, tous les modules</td>
+                    </tr>
+                    <tr>
+                        <td><strong>⚙️ Resp. Operations</strong></td>
+                        <td><span class="tag tag-orange">Global</span></td>
+                        <td>Pilotage quotidien, parametrage, controle, validation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>📦 Gestionnaire Stock</strong></td>
+                        <td><span class="tag tag-blue">Stock / Lots</span></td>
+                        <td>Mouvements stock, inventaires, lots, controle caisse</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🔪 Agent Production</strong></td>
+                        <td><span class="tag tag-green">Production</span></td>
+                        <td>Saisie production, observations, suivi rendement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🛒 Commercial</strong></td>
+                        <td><span class="tag tag-gray">Ventes</span></td>
+                        <td>Saisie ventes, clients, encaissements, suivi impayes</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="grid-3">
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:32px; margin-bottom:8px;">🔒</div>
+                    <h3 style="font-size:15px;">Mots de passe haches</h3>
+                    <p style="font-size:13px;">Bcrypt 12 rounds — impossible de retrouver un mot de passe</p>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:32px; margin-bottom:8px;">📝</div>
+                    <h3 style="font-size:15px;">Journal d'audit</h3>
+                    <p style="font-size:13px;">Chaque action est tracee : qui, quoi, quand, adresse IP</p>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:32px; margin-bottom:8px;">🔐</div>
+                    <h3 style="font-size:15px;">Sessions chiffrees</h3>
+                    <p style="font-size:13px;">HTTPS obligatoire, sessions cryptees, protection CSRF</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 : EXPORTS & RAPPORTS -->
+    <!-- ============================================================ -->
+    <div class="slide slide-dark" id="slide-9">
+        <div class="slide-header">
+            <div class="slide-number">Rapports</div>
+            <h2>Exports <span>Excel</span> et rapports <span>PDF</span></h2>
+        </div>
+        <div class="grid-2 content" style="margin-top: 10px;">
+            <div>
+                <div class="card-dark" style="margin-bottom:16px;">
+                    <h3 style="color: #22c55e; margin-bottom:16px;">📊 6 Exports Excel</h3>
+                    <table class="clean" style="color: rgba(255,255,255,0.7);">
+                        <tr><td style="color:white; border-color: rgba(255,255,255,0.1);">Ventes</td><td style="color:rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1);">Filtrable par dates</td></tr>
+                        <tr><td style="color:white; border-color: rgba(255,255,255,0.1);">Lots / Achats</td><td style="color:rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1);">Filtrable par dates</td></tr>
+                        <tr><td style="color:white; border-color: rgba(255,255,255,0.1);">Clients</td><td style="color:rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1);">Tous les clients actifs</td></tr>
+                        <tr><td style="color:white; border-color: rgba(255,255,255,0.1);">Charges</td><td style="color:rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1);">Filtrable par dates</td></tr>
+                        <tr><td style="color:white; border-color: rgba(255,255,255,0.1);">Caisses</td><td style="color:rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1);">Filtrable par dates</td></tr>
+                        <tr><td style="color:white; border-color: rgba(255,255,255,0.1);">Stock</td><td style="color:rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.1);">Photo instantanee</td></tr>
+                    </table>
+                </div>
+                <div class="card-dark">
+                    <h3 style="color: #3b82f6; margin-bottom:12px;">📥 Import Excel</h3>
+                    <p style="color:rgba(255,255,255,0.6); font-size:14px;">Import de clients depuis un fichier Excel avec validation automatique des donnees et gestion des erreurs</p>
+                </div>
+            </div>
+            <div>
+                <div class="card-dark" style="margin-bottom:16px;">
+                    <h3 style="color: #ef4444; margin-bottom:16px;">📄 2 Rapports PDF</h3>
+                    <div style="background: rgba(255,255,255,0.05); border-radius:12px; padding:20px; margin-bottom:16px;">
+                        <h3 style="font-size:16px; margin-bottom:8px; color:white;">Recu de vente</h3>
+                        <p style="color:rgba(255,255,255,0.5); font-size:13px;">En-tete CHAPCHAP, informations client, detail des produits, totaux, statut paiement, observations</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); border-radius:12px; padding:20px;">
+                        <h3 style="font-size:16px; margin-bottom:8px; color:white;">Rapport de caisse</h3>
+                        <p style="color:rgba(255,255,255,0.5); font-size:13px;">Resume journalier complet : encaissements, decaissements, detail charges, solde, versements, ecart, signatures</p>
+                    </div>
+                </div>
+                <div class="card-dark" style="text-align:center; border-color: var(--orange);">
+                    <p style="color:var(--orange); font-size:15px; font-weight:600;">Tous les exports sont telechargeable en 1 clic depuis l'interface</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 : FIABILITÉ & BACKUPS -->
+    <!-- ============================================================ -->
+    <div class="slide slide-std" id="slide-10">
+        <div class="slide-header">
+            <div class="slide-number">Fiabilite</div>
+            <h2>Backups et <span>continuite</span></h2>
+        </div>
+        <div class="grid-2 content" style="align-items:start;">
+            <div>
+                <div class="card" style="margin-bottom:20px; border-left: 4px solid var(--green);">
+                    <h3>Sauvegardes automatiques</h3>
+                    <table class="clean" style="margin-top:12px;">
+                        <tr><td>Backup BDD</td><td><strong>Tous les jours a 2h</strong></td></tr>
+                        <tr><td>Backup complet</td><td><strong>Chaque dimanche a 4h</strong></td></tr>
+                        <tr><td>Nettoyage auto</td><td><strong>Retention 30 jours</strong></td></tr>
+                        <tr><td>Monitoring</td><td><strong>Alerte si backup manquant</strong></td></tr>
+                    </table>
+                </div>
+                <div class="card" style="border-left: 4px solid var(--blue);">
+                    <h3>Tests automatises</h3>
+                    <p style="margin-top:8px;">
+                        <span class="badge badge-success" style="font-size:16px;">27 tests — 72 verifications — 100% OK</span>
+                    </p>
+                    <ul style="margin-top:12px;">
+                        <li>Calculs stock et CMP</li>
+                        <li>Flux de vente complet</li>
+                        <li>Paiements partiels et credits</li>
+                        <li>Annulations avec reconstitution stock</li>
+                        <li>Calculs lots et factures fournisseur</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="margin-bottom:20px; border-left: 4px solid var(--orange);">
+                    <h3>Hebergement recommande</h3>
+                    <ul>
+                        <li><strong>VPS</strong> : DigitalOcean ou Hetzner</li>
+                        <li><strong>Deploiement</strong> : Laravel Forge (automatise)</li>
+                        <li><strong>SSL</strong> : Let's Encrypt (HTTPS gratuit)</li>
+                        <li><strong>Cout estimé</strong> : ~15 000 FCFA / mois</li>
+                    </ul>
+                </div>
+                <div class="card" style="border-left: 4px solid #8b5cf6;">
+                    <h3>Optimisations integrees</h3>
+                    <ul>
+                        <li>Mise en cache des configurations</li>
+                        <li>Requetes optimisees (pas de N+1)</li>
+                        <li>Dashboard en 2-3 requetes au lieu de 60+</li>
+                        <li>Compression des backups (gzip)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 11 : PLANNING -->
+    <!-- ============================================================ -->
+    <div class="slide slide-dark" id="slide-11">
+        <div class="slide-header">
+            <div class="slide-number">Planning</div>
+            <h2>Avancement du <span>projet</span></h2>
+        </div>
+        <div class="grid-2 content" style="align-items: start; margin-top: 10px;">
+            <div>
+                <div class="card-dark">
+                    <h3 style="color:var(--green); margin-bottom:16px;">Phases terminees</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S1</strong> — Setup projet & architecture</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S2</strong> — BDD, migrations, models, seeders</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S3</strong> — Module Lots & Achats</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S4</strong> — Module Production</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S5</strong> — Module Stock & Transferts</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S6</strong> — CRM, Ventes & Paiements</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S7</strong> — Caisse & Charges</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S8</strong> — Modules Eau & Viande</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S9</strong> — Dashboards & KPI</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S10</strong> — Imports / Exports Excel & PDF</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S11</strong> — Tests & optimisation</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot done"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S12</strong> — Deploiement & documentation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card-dark" style="margin-bottom:20px;">
+                    <h3 style="color:var(--orange); margin-bottom:16px;">Prochaines etapes</h3>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-label" style="color:rgba(255,255,255,0.7);"><strong style="color:white;">S13-14</strong> — Stabilisation terrain</div>
+                        </div>
+                    </div>
+                    <ul style="list-style:none; padding:0; margin-top:16px;">
+                        <li style="padding:6px 0; color:rgba(255,255,255,0.6); font-size:14px;">→ Formation des equipes sur site</li>
+                        <li style="padding:6px 0; color:rgba(255,255,255,0.6); font-size:14px;">→ Ajustements UX selon retours terrain</li>
+                        <li style="padding:6px 0; color:rgba(255,255,255,0.6); font-size:14px;">→ Import de l'historique existant</li>
+                        <li style="padding:6px 0; color:rgba(255,255,255,0.6); font-size:14px;">→ Correction des bugs remontes</li>
+                        <li style="padding:6px 0; color:rgba(255,255,255,0.6); font-size:14px;">→ Mise en production definitive</li>
+                    </ul>
+                </div>
+                <div class="card-dark" style="border: 2px solid var(--orange); text-align:center;">
+                    <div class="stat-big" style="font-size:48px;">12 / 14</div>
+                    <div class="stat-label" style="color:rgba(255,255,255,0.5);">semaines completees</div>
+                    <div style="margin-top:12px; background: rgba(249,115,22,0.2); border-radius:20px; padding: 4px;">
+                        <div style="width: 86%; height: 8px; background: var(--orange); border-radius:20px;"></div>
+                    </div>
+                    <p style="color:var(--orange); font-size:14px; margin-top:8px; font-weight:600;">86% du projet realise</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 12 : FORMATION -->
+    <!-- ============================================================ -->
+    <div class="slide slide-std" id="slide-12">
+        <div class="slide-header">
+            <div class="slide-number">Mise en service</div>
+            <h2>Plan de <span>formation</span></h2>
+        </div>
+        <div class="grid-2 content" style="align-items: start;">
+            <div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="icon icon-orange">📚</div>
+                    <h3>Documentation livree</h3>
+                    <ul>
+                        <li><strong>Guide utilisateur complet</strong> — toutes les fonctions expliquees pas a pas</li>
+                        <li><strong>Guide de deploiement serveur</strong> — installation, configuration, backups</li>
+                        <li><strong>Cahier des charges technique</strong> — specifications detaillees</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="icon icon-green">🎯</div>
+                    <h3>Formations recommandees</h3>
+                    <table class="clean" style="margin-top:10px;">
+                        <tr>
+                            <td><strong>Session 1</strong></td>
+                            <td>Gerant + Resp. Operations<br><span style="font-size:12px; color:var(--gray);">Dashboard, KPI, validation, exports</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session 2</strong></td>
+                            <td>Gestionnaire Stock<br><span style="font-size:12px; color:var(--gray);">Lots, stock, transferts, inventaire</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session 3</strong></td>
+                            <td>Agent Production<br><span style="font-size:12px; color:var(--gray);">Saisie production, rendement</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session 4</strong></td>
+                            <td>Commerciaux<br><span style="font-size:12px; color:var(--gray);">Ventes, clients, encaissements, caisse</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="icon icon-blue">📱</div>
+                    <h3>Accessibilite</h3>
+                    <ul>
+                        <li><strong>100% web</strong> — rien a installer sur les postes</li>
+                        <li><strong>Mobile-friendly</strong> — utilisable sur telephone</li>
+                        <li><strong>Multi-utilisateurs</strong> — acces simultane</li>
+                        <li><strong>Pas besoin de connexion internet haut debit</strong> — interface legere</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <h3>Commerciaux terrain</h3>
+                    <p>Les commerciaux (Hector, Niamke, Jessy, Yves, Evelyne) peuvent saisir les ventes directement depuis leur telephone sur le terrain</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 13 : CONCLUSION -->
+    <!-- ============================================================ -->
+    <div class="slide slide-cover" id="slide-13">
+        <div>
+            <div class="logo" style="font-size: 72px; margin-bottom: 24px;">CHAPCHAP</div>
+            <p style="font-size: 24px; color: rgba(255,255,255,0.7); margin-bottom: 40px; max-width: 700px; line-height: 1.6;">
+                Une application <strong style="color: var(--orange);">complete</strong>, <strong style="color: var(--orange);">fiable</strong> et <strong style="color: var(--orange);">simple</strong> pour piloter toute l'activite au quotidien.
+            </p>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;">
+                <div style="background: rgba(255,255,255,0.08); border-radius:12px; padding:20px 28px; text-align:center;">
+                    <div style="font-size:28px; margin-bottom:4px;">🐔</div>
+                    <div style="font-size:13px; color:rgba(255,255,255,0.5);">De l'achat</div>
+                </div>
+                <div style="font-size:24px; color:var(--orange); display:flex; align-items:center;">→</div>
+                <div style="background: rgba(255,255,255,0.08); border-radius:12px; padding:20px 28px; text-align:center;">
+                    <div style="font-size:28px; margin-bottom:4px;">🔪</div>
+                    <div style="font-size:13px; color:rgba(255,255,255,0.5);">A la decoupe</div>
+                </div>
+                <div style="font-size:24px; color:var(--orange); display:flex; align-items:center;">→</div>
+                <div style="background: rgba(255,255,255,0.08); border-radius:12px; padding:20px 28px; text-align:center;">
+                    <div style="font-size:28px; margin-bottom:4px;">🛒</div>
+                    <div style="font-size:13px; color:rgba(255,255,255,0.5);">A la vente</div>
+                </div>
+                <div style="font-size:24px; color:var(--orange); display:flex; align-items:center;">→</div>
+                <div style="background: rgba(255,255,255,0.08); border-radius:12px; padding:20px 28px; text-align:center;">
+                    <div style="font-size:28px; margin-bottom:4px;">💰</div>
+                    <div style="font-size:13px; color:rgba(255,255,255,0.5);">A la caisse</div>
+                </div>
+            </div>
+            <p style="font-size: 18px; color: rgba(255,255,255,0.4);">
+                Tout est connecte. Tout est trace. Tout est automatise.
+            </p>
+            <div style="margin-top:40px;">
+                <p style="font-size: 14px; color: rgba(255,255,255,0.25);">Appuyez sur ← ou → pour naviguer</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT NAVIGATION -->
+    <!-- ============================================================ -->
+    <script>
+        let current = 0;
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+
+        function showSlide(n) {
+            slides[current].classList.remove('active');
+            current = (n + total) % total;
+            slides[current].classList.add('active');
+            document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+            document.getElementById('progress').style.width = `${((current + 1) / total) * 100}%`;
+        }
+
+        function nextSlide() { showSlide(current + 1); }
+        function prevSlide() { showSlide(current - 1); }
+
+        // Navigation clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                nextSlide();
+            }
+            if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+                e.preventDefault();
+                prevSlide();
+            }
+            // Touche Home → premiere slide
+            if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+            // Touche End → derniere slide
+            if (e.key === 'End') { e.preventDefault(); showSlide(total - 1); }
+        });
+
+        // Navigation tactile (swipe)
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) {
+                diff > 0 ? nextSlide() : prevSlide();
+            }
+        });
+
+        // Initialiser
+        showSlide(0);
+    </script>
+</body>
+</html>

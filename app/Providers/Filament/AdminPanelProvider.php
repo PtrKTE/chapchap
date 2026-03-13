@@ -2,8 +2,10 @@
 
 namespace App\Providers\Filament;
 
-use Filament\Http\Middleware\Authenticate;
+use App\Filament\Pages\MonProfil;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Navigation\MenuItem;
+use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -17,6 +19,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -28,11 +31,45 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            // Logo affiché dans le header et la page de connexion
+            ->brandLogo(asset('images/Logo_chapchap.jpeg'))
+            ->brandLogoHeight('3rem')
             ->brandName('ChapChap')
+            // Favicon affiché dans l'onglet du navigateur
+            ->favicon(asset('images/favicon.ico'))
             ->colors([
                 'primary' => Color::Orange,
             ])
             ->sidebarCollapsibleOnDesktop()
+            // Menu profil enrichi : rôle, emplacement, lien "Mon profil"
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label(fn () => auth()->user()?->profil?->getLabel() ?? 'Utilisateur')
+                    ->icon('heroicon-o-shield-check')
+                    ->url('#'),
+                MenuItem::make()
+                    ->label(fn () => auth()->user()?->emplacement?->nom ?? 'Aucun site')
+                    ->icon('heroicon-o-map-pin')
+                    ->url('#'),
+                'profile' => MenuItem::make()
+                    ->label('Mon profil')
+                    ->icon('heroicon-o-user-circle')
+                    ->url(fn () => MonProfil::getUrl()),
+            ])
+            // CSS custom
+            ->renderHook(
+                'panels::head.end',
+                fn (): HtmlString => new HtmlString(
+                    '<link rel="stylesheet" href="' . asset('css/chapchap-admin.css') . '">'
+                )
+            )
+            // Déconnexion automatique en cas d'inactivité (avec avertissement)
+            ->renderHook(
+                'panels::body.end',
+                fn () => auth()->check()
+                    ? view('filament.components.idle-timeout')
+                    : ''
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -40,8 +77,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets métier découverts automatiquement dans app/Filament/Widgets/
             ])
             ->middleware([
                 EncryptCookies::class,

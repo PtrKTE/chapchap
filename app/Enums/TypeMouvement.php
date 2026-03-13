@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TypeMouvement: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TypeMouvement: string implements HasLabel
 {
     case ENTREE_PRODUCTION = 'entree_production';
     case ENTREE_ACHAT = 'entree_achat';
@@ -14,8 +16,9 @@ enum TypeMouvement: string
     case TRANSFERT_ENTREE = 'transfert_entree';
     case AJUSTEMENT_PLUS = 'ajustement_plus';
     case AJUSTEMENT_MOINS = 'ajustement_moins';
+    case ENTREE_ANNULATION = 'entree_annulation';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::ENTREE_PRODUCTION => 'Entrée production',
@@ -26,6 +29,7 @@ enum TypeMouvement: string
             self::TRANSFERT_ENTREE => 'Transfert entrée',
             self::AJUSTEMENT_PLUS => 'Ajustement (+)',
             self::AJUSTEMENT_MOINS => 'Ajustement (-)',
+            self::ENTREE_ANNULATION => 'Entrée annulation vente',
         };
     }
 
@@ -36,6 +40,7 @@ enum TypeMouvement: string
             self::ENTREE_ACHAT,
             self::TRANSFERT_ENTREE,
             self::AJUSTEMENT_PLUS,
+            self::ENTREE_ANNULATION,
         ]);
     }
 

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum Profil: string
+use Filament\Support\Contracts\HasLabel;
+
+enum Profil: string implements HasLabel
 {
     case GERANT = 'gerant';
     case RESP_OPERATIONS = 'resp_operations';
@@ -16,7 +18,7 @@ enum Profil: string
     /**
      * Libellé en français pour l'interface.
      */
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::GERANT => 'Gérant',

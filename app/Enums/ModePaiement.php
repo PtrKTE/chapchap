@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum ModePaiement: string
+use Filament\Support\Contracts\HasLabel;
+
+enum ModePaiement: string implements HasLabel
 {
     case ESPECES = 'especes';
     case WAVE = 'wave';
@@ -12,7 +14,7 @@ enum ModePaiement: string
     case CHEQUE = 'cheque';
     case VIREMENT = 'virement';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::ESPECES => 'Espèces',

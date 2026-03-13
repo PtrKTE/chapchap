@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TypeCharge: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TypeCharge: string implements HasLabel
 {
     case FIXE = 'fixe';
     case VARIABLE = 'variable';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::FIXE => 'Fixe',

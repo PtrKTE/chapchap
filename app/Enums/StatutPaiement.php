@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum StatutPaiement: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum StatutPaiement: string implements HasLabel, HasColor
 {
     case PAYE = 'paye';
     case PARTIEL = 'partiel';
     case CREDIT = 'credit';
     case REGLE_PATRONNE = 'regle_patronne';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::PAYE => 'Payé',
@@ -21,7 +24,7 @@ enum StatutPaiement: string
         };
     }
 
-    public function color(): string
+    public function getColor(): string
     {
         return match ($this) {
             self::PAYE => 'success',

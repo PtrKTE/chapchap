@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum TypeClient: string
+use Filament\Support\Contracts\HasLabel;
+
+enum TypeClient: string implements HasLabel
 {
     case RESTAURANT = 'restaurant';
     case MAQUIS = 'maquis';
@@ -16,7 +18,7 @@ enum TypeClient: string
     case INDUSTRIEL = 'industriel';
     case AUTRE = 'autre';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::RESTAURANT => 'Restaurant',

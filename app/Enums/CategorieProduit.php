@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum CategorieProduit: string
+use Filament\Support\Contracts\HasLabel;
+
+enum CategorieProduit: string implements HasLabel
 {
     case VOLAILLE = 'volaille';
     case DECOUPE = 'decoupe';
@@ -13,7 +15,7 @@ enum CategorieProduit: string
     case EAU = 'eau';
     case VIANDE = 'viande';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::VOLAILLE => 'Volaille',

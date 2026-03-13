@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum Canal: string
+use Filament\Support\Contracts\HasLabel;
+
+enum Canal: string implements HasLabel
 {
     case BOUTIQUE = 'boutique';
     case COMMERCIAL = 'commercial';
     case LIVRAISON = 'livraison';
     case B2B = 'b2b';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::BOUTIQUE => 'Boutique',

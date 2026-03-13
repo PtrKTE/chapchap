@@ -1,0 +1,20 @@
+/*
+ * Thème custom CHAPCHAP — Filament Admin
+ *
+ * Ce fichier est chargé par le panel Filament via la méthode ->viteTheme()
+ * ou directement via un asset CSS.
+ */
+
+/* ============================================
+   Masquer la barre de défilement dans la sidebar
+   ============================================ */
+
+/* Sidebar navigation — masque le scrollbar tout en gardant le défilement */
+.fi-sidebar-nav {
+    scrollbar-width: none;           /* Firefox */
+    -ms-overflow-style: none;        /* IE / Edge */
+}
+
+.fi-sidebar-nav::-webkit-scrollbar {
+    display: none;                   /* Chrome, Safari, Opera */
+}
