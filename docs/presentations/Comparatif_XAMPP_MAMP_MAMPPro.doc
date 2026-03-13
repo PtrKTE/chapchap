@@ -1,0 +1,628 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word 15">
+<meta name="Originator" content="Microsoft Word 15">
+<style>
+    body {
+        font-family: Calibri, Arial, sans-serif;
+        font-size: 11pt;
+        color: #333;
+        margin: 2cm;
+    }
+    h1 {
+        font-size: 22pt;
+        color: #1a1a2e;
+        text-align: center;
+        border-bottom: 3px solid #e94560;
+        padding-bottom: 10pt;
+        margin-bottom: 20pt;
+    }
+    h2 {
+        font-size: 16pt;
+        color: #16213e;
+        border-bottom: 2px solid #0f3460;
+        padding-bottom: 5pt;
+        margin-top: 25pt;
+    }
+    h3 {
+        font-size: 13pt;
+        color: #e94560;
+        margin-top: 15pt;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 10pt 0 20pt 0;
+        font-size: 10pt;
+    }
+    th {
+        background-color: #16213e;
+        color: white;
+        padding: 8pt 10pt;
+        text-align: left;
+        border: 1px solid #0f3460;
+        font-weight: bold;
+    }
+    td {
+        padding: 6pt 10pt;
+        border: 1px solid #ccc;
+        vertical-align: top;
+    }
+    tr:nth-child(even) {
+        background-color: #f5f5f5;
+    }
+    tr:hover {
+        background-color: #e8f4f8;
+    }
+    .oui {
+        color: #27ae60;
+        font-weight: bold;
+    }
+    .non {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 12pt;
+        color: #666;
+        margin-bottom: 5pt;
+    }
+    .date {
+        text-align: center;
+        font-size: 10pt;
+        color: #999;
+        margin-bottom: 30pt;
+    }
+    .verdict {
+        background-color: #f0f7ff;
+        border-left: 4px solid #0f3460;
+        padding: 10pt 15pt;
+        margin: 15pt 0;
+    }
+    .footer {
+        text-align: center;
+        font-size: 9pt;
+        color: #999;
+        margin-top: 40pt;
+        border-top: 1px solid #ddd;
+        padding-top: 10pt;
+    }
+</style>
+</head>
+<body>
+
+<h1>Comparatif Technique<br>XAMPP vs MAMP vs MAMP Pro</h1>
+<p class="subtitle">Analyse pour le projet CHAPCHAP — Environnement de développement macOS</p>
+<p class="date">Février 2026</p>
+
+<!-- ============================================ -->
+<h2>1. Informations générales</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Spécification</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>Éditeur</b></td>
+        <td>Apache Friends</td>
+        <td>appsolute GmbH</td>
+        <td>appsolute GmbH</td>
+    </tr>
+    <tr>
+        <td><b>Prix</b></td>
+        <td>Gratuit</td>
+        <td>Gratuit</td>
+        <td>~99€/an ou ~59€ licence perpétuelle</td>
+    </tr>
+    <tr>
+        <td><b>Licence</b></td>
+        <td>Open Source (GPL)</td>
+        <td>Propriétaire (freeware)</td>
+        <td>Propriétaire (commerciale)</td>
+    </tr>
+    <tr>
+        <td><b>macOS Intel</b></td>
+        <td>Oui</td>
+        <td>Oui</td>
+        <td>Oui</td>
+    </tr>
+    <tr>
+        <td><b>Apple Silicon natif</b></td>
+        <td>Non (Rosetta)</td>
+        <td>Oui</td>
+        <td>Oui</td>
+    </tr>
+    <tr>
+        <td><b>Windows</b></td>
+        <td>Oui</td>
+        <td>Non</td>
+        <td>Non</td>
+    </tr>
+    <tr>
+        <td><b>Linux</b></td>
+        <td>Oui</td>
+        <td>Non</td>
+        <td>Non</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>2. Serveur Web</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Spécification</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>Apache</b></td>
+        <td>2.4.x</td>
+        <td>2.4.x</td>
+        <td>2.4.x</td>
+    </tr>
+    <tr>
+        <td><b>Nginx</b></td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui (Apache OU Nginx au choix)</td>
+    </tr>
+    <tr>
+        <td><b>Ports HTTP par défaut</b></td>
+        <td>80 / 443</td>
+        <td>8888 / 8890</td>
+        <td>Configurable (80, 443, etc.)</td>
+    </tr>
+    <tr>
+        <td><b>Virtual Hosts</b></td>
+        <td>Manuel (httpd-vhosts.conf)</td>
+        <td class="non">Non supporté</td>
+        <td class="oui">Interface graphique</td>
+    </tr>
+    <tr>
+        <td><b>SSL / HTTPS local</b></td>
+        <td>Manuel (OpenSSL)</td>
+        <td class="non">Non</td>
+        <td class="oui">1 clic (certificat auto-signé)</td>
+    </tr>
+    <tr>
+        <td><b>Fichier de configuration</b></td>
+        <td>Édition manuelle des fichiers .conf</td>
+        <td>Basique</td>
+        <td>GUI complète + accès fichiers</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>3. PHP</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Spécification</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>Version incluse</b></td>
+        <td>1 seule (8.2.x)</td>
+        <td>1 seule (8.x)</td>
+        <td>Multiple (5.6 à 8.4)</td>
+    </tr>
+    <tr>
+        <td><b>Switch de version</b></td>
+        <td class="non">Impossible (réinstallation requise)</td>
+        <td class="non">Impossible</td>
+        <td class="oui">1 clic dans l'interface</td>
+    </tr>
+    <tr>
+        <td><b>Version PHP par projet</b></td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Extensions standard</b></td>
+        <td>Oui</td>
+        <td>Oui</td>
+        <td>Oui + supplémentaires</td>
+    </tr>
+    <tr>
+        <td><b>OPcache</b></td>
+        <td>Activable manuellement</td>
+        <td>Activable manuellement</td>
+        <td>Oui + config via GUI</td>
+    </tr>
+    <tr>
+        <td><b>Xdebug</b></td>
+        <td>Installation manuelle</td>
+        <td>Installation manuelle</td>
+        <td class="oui">Inclus, activation 1 clic</td>
+    </tr>
+    <tr>
+        <td><b>Composer inclus</b></td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+    </tr>
+    <tr>
+        <td><b>Édition php.ini</b></td>
+        <td>Manuelle (fichier texte)</td>
+        <td>Manuelle (fichier texte)</td>
+        <td>GUI + fichier texte</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>4. Base de données</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Spécification</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>MySQL</b></td>
+        <td class="non">Non (MariaDB à la place)</td>
+        <td class="oui">MySQL 5.7 + 8.0</td>
+        <td class="oui">MySQL 5.7 + 8.0</td>
+    </tr>
+    <tr>
+        <td><b>MariaDB</b></td>
+        <td class="oui">Oui (10.4.x par défaut)</td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+    </tr>
+    <tr>
+        <td><b>Port par défaut</b></td>
+        <td>3306</td>
+        <td>8889</td>
+        <td>Configurable</td>
+    </tr>
+    <tr>
+        <td><b>phpMyAdmin</b></td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Compatibilité Sequel Pro/Ace</b></td>
+        <td>Oui</td>
+        <td>Oui</td>
+        <td>Oui</td>
+    </tr>
+    <tr>
+        <td><b>Backup intégré</b></td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>5. Outils inclus</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Outil</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>phpMyAdmin</b></td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>FileZilla (FTP)</b></td>
+        <td class="oui">Oui</td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+    </tr>
+    <tr>
+        <td><b>ProFTPD</b></td>
+        <td class="oui">Oui</td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+    </tr>
+    <tr>
+        <td><b>Serveur mail (Postfix)</b></td>
+        <td>Manuel</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui (test emails intégré)</td>
+    </tr>
+    <tr>
+        <td><b>Tomcat (Java)</b></td>
+        <td class="oui">Oui</td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+    </tr>
+    <tr>
+        <td><b>Perl</b></td>
+        <td class="oui">Oui</td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+    </tr>
+    <tr>
+        <td><b>Python</b></td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Ruby</b></td>
+        <td class="non">Non</td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>DNS local (domaines .test)</b></td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui (auto /etc/hosts)</td>
+    </tr>
+    <tr>
+        <td><b>DynDNS</b></td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>6. Administration et interface</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Fonctionnalité</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>Interface graphique</b></td>
+        <td>manager-osx (basique)</td>
+        <td>Fenêtre start/stop uniquement</td>
+        <td>Application complète</td>
+    </tr>
+    <tr>
+        <td><b>Icône barre de menu</b></td>
+        <td class="non">Non</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Démarrage auto avec macOS</b></td>
+        <td>Manuel (LaunchDaemon)</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Accès aux logs</b></td>
+        <td>Fichiers texte uniquement</td>
+        <td>Fichiers texte uniquement</td>
+        <td>GUI + fichiers texte</td>
+    </tr>
+    <tr>
+        <td><b>Configuration centralisée</b></td>
+        <td class="non">Non (fichiers éparpillés)</td>
+        <td class="non">Non</td>
+        <td class="oui">Oui (1 interface unique)</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>7. Réseau et accès</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Fonctionnalité</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>localhost</b></td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Domaines .test personnalisés</b></td>
+        <td>Manuel (/etc/hosts)</td>
+        <td class="non">Non</td>
+        <td class="oui">Automatique</td>
+    </tr>
+    <tr>
+        <td><b>Accès réseau local (LAN)</b></td>
+        <td>Config manuelle</td>
+        <td>Oui</td>
+        <td>Oui (facilité)</td>
+    </tr>
+    <tr>
+        <td><b>HTTPS local</b></td>
+        <td>Manuel (OpenSSL)</td>
+        <td class="non">Non</td>
+        <td class="oui">Certificat auto-signé automatique</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>8. Performance et stabilité</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Critère</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>RAM au repos</b></td>
+        <td>~150-200 Mo</td>
+        <td>~100-150 Mo</td>
+        <td>~100-150 Mo</td>
+    </tr>
+    <tr>
+        <td><b>Temps de démarrage</b></td>
+        <td>~5-10 secondes</td>
+        <td>~3-5 secondes</td>
+        <td>~3-5 secondes</td>
+    </tr>
+    <tr>
+        <td><b>Apple Silicon natif</b></td>
+        <td class="non">Non (Rosetta = plus lent)</td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Stabilité après MAJ macOS</b></td>
+        <td style="color:#e74c3c"><b>Fragile</b> (casse souvent)</td>
+        <td>Bonne</td>
+        <td style="color:#27ae60"><b>Bonne</b> (suivi actif)</td>
+    </tr>
+    <tr>
+        <td><b>Conflits avec Homebrew</b></td>
+        <td style="color:#e74c3c">Possibles</td>
+        <td>Rares</td>
+        <td>Rares</td>
+    </tr>
+    <tr>
+        <td><b>Problèmes de permissions</b></td>
+        <td style="color:#e74c3c">Fréquents</td>
+        <td>Rares</td>
+        <td>Rares</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>9. Pertinence pour le projet CHAPCHAP</h2>
+<!-- ============================================ -->
+
+<table>
+    <tr>
+        <th style="width:25%">Besoin CHAPCHAP</th>
+        <th style="width:25%">XAMPP</th>
+        <th style="width:25%">MAMP (gratuit)</th>
+        <th style="width:25%">MAMP Pro</th>
+    </tr>
+    <tr>
+        <td><b>PHP 8.2+ (requis Laravel 11)</b></td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+        <td class="oui">Oui</td>
+    </tr>
+    <tr>
+        <td><b>Montée vers PHP 8.4</b></td>
+        <td style="color:#e74c3c">Manuelle et risquée</td>
+        <td class="non">Impossible</td>
+        <td class="oui">1 clic</td>
+    </tr>
+    <tr>
+        <td><b>MySQL 8+ / MariaDB 10.6+</b></td>
+        <td>MariaDB uniquement</td>
+        <td class="oui">MySQL 8</td>
+        <td class="oui">MySQL 8</td>
+    </tr>
+    <tr>
+        <td><b>Filament 3</b></td>
+        <td>OK</td>
+        <td>OK</td>
+        <td>OK</td>
+    </tr>
+    <tr>
+        <td><b>Test envoi PDF par mail</b></td>
+        <td>Config manuelle</td>
+        <td class="non">Non</td>
+        <td class="oui">Postfix intégré</td>
+    </tr>
+    <tr>
+        <td><b>Debug avec Xdebug</b></td>
+        <td>Installation manuelle</td>
+        <td>Installation manuelle</td>
+        <td class="oui">1 clic</td>
+    </tr>
+    <tr>
+        <td><b>Domaine local (chapchap.test)</b></td>
+        <td>Manuel</td>
+        <td class="non">Non</td>
+        <td class="oui">Automatique</td>
+    </tr>
+</table>
+
+<!-- ============================================ -->
+<h2>10. Verdict et recommandations</h2>
+<!-- ============================================ -->
+
+<div class="verdict">
+    <h3>XAMPP — Budget zéro, tolérance aux galères</h3>
+    <p>Gratuit et fonctionnel, mais fragile sur macOS. Convient si on ne change pas de version PHP et qu'on accepte les ajustements manuels. <b>Note : utilise MariaDB et non MySQL.</b></p>
+</div>
+
+<div class="verdict">
+    <h3>MAMP Gratuit — Le moins intéressant</h3>
+    <p>N'offre rien de plus que XAMPP mais sans ses outils extras (FTP, Perl). Et sans les avantages de MAMP Pro (multi-PHP, vhosts, SSL). <b>Difficile à justifier.</b></p>
+</div>
+
+<div class="verdict">
+    <h3>MAMP Pro — Le tout-en-un professionnel</h3>
+    <p>Switch PHP en 1 clic, SSL local, Xdebug facile, vhosts GUI. <b>Le meilleur choix tout-en-un si on est prêt à payer.</b></p>
+</div>
+
+<div class="verdict" style="border-left-color: #27ae60; background-color: #f0fff0;">
+    <h3>Alternative recommandée : Laravel Herd (gratuit) + MySQL via XAMPP</h3>
+    <p>Conçu spécifiquement pour Laravel. Switch PHP instantané, domaines .test automatiques, performances natives Apple Silicon. <b>La solution la plus adaptée au projet CHAPCHAP.</b></p>
+</div>
+
+<br>
+<table>
+    <tr>
+        <th style="width:40%">Profil développeur</th>
+        <th style="width:60%">Recommandation</th>
+    </tr>
+    <tr>
+        <td>Budget zéro, pas besoin de switch PHP</td>
+        <td><b>XAMPP</b> — ça fait le job</td>
+    </tr>
+    <tr>
+        <td>Budget zéro, besoin de flexibilité PHP</td>
+        <td><b>Laravel Herd gratuit + MySQL XAMPP</b></td>
+    </tr>
+    <tr>
+        <td>Prêt à payer, veut tout intégré</td>
+        <td><b>MAMP Pro</b> — le plus complet</td>
+    </tr>
+    <tr>
+        <td>Développeur Laravel sérieux sur Mac</td>
+        <td><b>Laravel Herd</b> — conçu pour ça</td>
+    </tr>
+</table>
+
+<p class="footer">
+    Document généré pour le projet CHAPCHAP — Février 2026<br>
+    Comparatif basé sur les versions disponibles à cette date
+</p>
+
+</body>
+</html>
