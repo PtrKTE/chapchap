@@ -441,9 +441,10 @@ class LotResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLots::route('/'),
+            'index'  => Pages\ListLots::route('/'),
             'create' => Pages\CreateLot::route('/create'),
-            'edit' => Pages\EditLot::route('/{record}/edit'),
+            'view'   => Pages\ViewLot::route('/{record}'),
+            'edit'   => Pages\EditLot::route('/{record}/edit'),
         ];
     }
 
