@@ -298,9 +298,10 @@ class ClientResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListClients::route('/'),
+            'index'  => Pages\ListClients::route('/'),
             'create' => Pages\CreateClient::route('/create'),
-            'edit' => Pages\EditClient::route('/{record}/edit'),
+            'view'   => Pages\ViewClient::route('/{record}'),
+            'edit'   => Pages\EditClient::route('/{record}/edit'),
         ];
     }
 }

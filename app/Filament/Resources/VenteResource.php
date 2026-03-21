@@ -559,22 +559,9 @@ class VenteResource extends Resource
                     ->label('Annulée'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    // Bouton "Imprimer le reçu" affiché en bas de la modale Voir
-                    ->modalFooterActions(fn (Vente $record) => [
-                        Tables\Actions\Action::make('imprimer_recu')
-                            ->label('Imprimer le reçu')
-                            ->icon('heroicon-o-printer')
-                            ->color('success')
-                            ->url(route('vente.recu-pdf', $record))
-                            ->openUrlInNewTab(),
-                        Tables\Actions\Action::make('fermer')
-                            ->label('Fermer')
-                            ->color('gray')
-                            ->close(),
-                    ]),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                // Bouton pour imprimer le reçu PDF (ouvre dans un nouvel onglet)
+                // Bouton pour imprimer le reçu PDF directement depuis la liste
                 Tables\Actions\Action::make('imprimer')
                     ->label('Reçu')
                     ->icon('heroicon-o-printer')
@@ -623,9 +610,10 @@ class VenteResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVentes::route('/'),
+            'index'  => Pages\ListVentes::route('/'),
             'create' => Pages\CreateVente::route('/create'),
-            'edit' => Pages\EditVente::route('/{record}/edit'),
+            'view'   => Pages\ViewVente::route('/{record}'),
+            'edit'   => Pages\EditVente::route('/{record}/edit'),
         ];
     }
 }

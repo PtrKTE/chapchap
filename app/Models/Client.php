@@ -52,4 +52,16 @@ class Client extends Model
     {
         return $this->hasMany(Vente::class);
     }
+
+    /**
+     * Les 10 ventes les plus récentes du client (pour la fiche client).
+     *
+     * On utilise une relation dédiée pour éviter de charger toute l'historique.
+     */
+    public function ventesRecentes(): HasMany
+    {
+        return $this->hasMany(Vente::class)
+            ->orderBy('date_vente', 'desc')
+            ->limit(10);
+    }
 }

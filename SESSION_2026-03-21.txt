@@ -103,22 +103,45 @@
 
 ==============================================================
 
-## MODULE STOCK — S5 (EN COURS)
+## MODULE STOCK — S5
 --------------------------------------------------------------
 
-### Déjà en place (S2)
-- StockService complet (entree, sortie, transfert, ajustementInventaire, CMP)
-- StockEmplacementResource (lecture seule, alertes stock bas, lien mouvements)
-- MouvementStockResource (liste + détail modal)
-- TransfertResource (CRUD + EditTransfert avec action "Réceptionner")
-- InventaireResource (CRUD + EditInventaire avec action "Valider")
+### Fichiers créés / modifiés
+- app/Filament/Resources/TransfertResource/Pages/ViewTransfert.php      [NOUVEAU]
+- app/Filament/Resources/TransfertResource/Pages/ListTransferts.php     [MODIFIÉ]
+- app/Filament/Resources/TransfertResource.php                          [MODIFIÉ]
+- app/Filament/Resources/InventaireResource/Pages/ViewInventaire.php    [NOUVEAU]
+- app/Filament/Resources/InventaireResource/Pages/ListInventaires.php   [MODIFIÉ]
+- app/Filament/Resources/InventaireResource.php                         [MODIFIÉ]
+- app/Filament/Resources/StockEmplacementResource/Widgets/StockStatsWidget.php [NOUVEAU]
+- app/Filament/Resources/StockEmplacementResource/Pages/ListStockEmplacements.php [MODIFIÉ]
 
-### À compléter (en cours)
-- ViewTransfert page (créée, à compléter)
-- ViewInventaire page (créée, à compléter)
-- StockStatsWidget pour liste stocks
-- Onglets ListTransferts (En cours / Reçus / Annulés)
-- Onglets ListInventaires (En cours / Terminé / Validé)
+### Fonctionnalités
+1. ViewTransfert : action "Réceptionner" → StockService::transfert()
+   → sortie sur emplacement source + entrée sur emplacement destination
+   → statut passe à RECU
+2. ViewInventaire : action "Comptage terminé" + "Valider l'inventaire"
+   → validerInventaire() vérifie justifications si écart ≠ 0
+   → appelle StockService::ajustementInventaire() pour chaque ligne
+   → statut passe à VALIDE
+3. ListTransferts : onglets Tous / En cours / Reçus / Annulés
+4. ListInventaires : onglets Tous / En cours / Terminés / Validés
+5. StockStatsWidget : 4 KPI (Valeur totale, En stock, Alertes, Ruptures)
+
+### Déploiement : ✅ Réussi
+
+==============================================================
+
+## MODULE CRM + VENTES — S6 (EN COURS)
+--------------------------------------------------------------
+
+### À développer
+- ClientResource : CRUD clients B2B + particuliers
+- VenteResource : saisie vente (Filament) + lignes produits
+- VenteService : décrément stock + calcul marges CMP
+- PaiementResource : encaissements partiels / suivi crédit
+- Reçu PDF : barryvdh/laravel-dompdf
+- Onglets + Stats widgets pour ventes
 
 ==============================================================
 
@@ -131,8 +154,8 @@
 | S2    | BDD + Models + Resources de base  | ✅ Terminé    |
 | S3    | Module Lots/Achats                | ✅ Terminé    |
 | S4    | Module Production                 | ✅ Terminé    |
-| S5    | Module Stock                      | 🔄 En cours   |
-| S6    | CRM + Ventes                      | ⏳ À venir    |
+| S5    | Module Stock                      | ✅ Terminé    |
+| S6    | CRM + Ventes                      | 🔄 En cours   |
 | S7    | Caisse + Charges                  | ⏳ À venir    |
 | S8    | Eau + Viande                      | ⏳ À venir    |
 | S9    | Dashboards KPI                    | ⏳ À venir    |
@@ -141,6 +164,5 @@
 | S12   | Déploiement final                 | ✅ Fait       |
 
 ==============================================================
-  Session en cours : S5 — Module Stock
-  (ViewTransfert + ViewInventaire + StockStats + onglets)
+  Session en cours : S6 — CRM + Ventes
 ==============================================================

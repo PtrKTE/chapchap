@@ -7,15 +7,52 @@ namespace App\Filament\Resources\ClientResource\Pages;
 use App\Exports\ClientsExport;
 use App\Filament\Resources\ClientResource;
 use App\Imports\ClientsImport;
+use App\Models\Client;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ListClients extends ListRecords
 {
     protected static string $resource = ClientResource::class;
+
+    public function getTabs(): array
+    {
+        return [
+            'tous' => Tab::make('Tous')
+                ->badge(Client::count()),
+
+            'actifs' => Tab::make('Actifs')
+                ->badge(Client::where('actif', true)->count())
+                ->badgeColor('success')
+                ->modifyQueryUsing(fn (Builder $q) => $q->where('actif', true)),
+
+            'impayes' => Tab::make('Avec impayés')
+                ->badge(Client::whereHas('ventes', fn ($q) =>
+                    $q->where('annulee', false)->where('montant_restant', '>', 0)
+                )->count())
+                ->badgeColor('danger')
+                ->modifyQueryUsing(fn (Builder $q) => $q->whereHas('ventes', fn ($sq) =>
+                    $sq->where('annulee', false)->where('montant_restant', '>', 0)
+                )),
+
+            'inactifs' => Tab::make('Inactifs')
+                ->badge(Client::where('actif', false)->count())
+                ->badgeColor('gray')
+                ->modifyQueryUsing(fn (Builder $q) => $q->where('actif', false)),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            ClientResource\Widgets\ClientStatsWidget::class,
+        ];
+    }
 
     protected function getHeaderActions(): array
     {
