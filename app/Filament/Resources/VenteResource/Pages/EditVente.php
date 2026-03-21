@@ -10,7 +10,6 @@ use App\Enums\TypeMouvement;
 use App\Filament\Resources\VenteResource;
 use App\Models\Paiement;
 use App\Services\StockService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -68,20 +67,13 @@ class EditVente extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            // Bouton "Imprimer reçu PDF"
+            // Bouton "Imprimer reçu PDF" — redirige vers la route dédiée (mPDF)
             Actions\Action::make('imprimer_recu')
                 ->label('Imprimer reçu')
                 ->icon('heroicon-o-printer')
                 ->color('gray')
-                ->action(function () {
-                    $vente = $this->record->load(['lignes.produit', 'client', 'commercial', 'emplacement']);
-                    $pdf = Pdf::loadView('pdf.recu-vente', ['vente' => $vente]);
-
-                    return response()->streamDownload(
-                        fn() => print($pdf->output()),
-                        "recu_{$vente->numero_recu}.pdf"
-                    );
-                }),
+                ->url(fn () => route('vente.recu-pdf', $this->record))
+                ->openUrlInNewTab(),
 
             // Bouton "Encaisser un paiement" — pour les ventes à crédit ou partielles
             Actions\Action::make('encaisser')

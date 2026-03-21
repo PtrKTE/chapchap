@@ -113,9 +113,11 @@
 <body>
 
     {{-- EN-TÊTE --}}
+    {{-- mPDF charge les images via chemin absolu (file://) --}}
     <div class="header">
-        @if (file_exists(public_path('images/Logo_chapchap.jpeg')))
-            <img src="{{ public_path('images/Logo_chapchap.jpeg') }}" alt="Logo">
+        @php $logoPath = public_path('images/Logo_chapchap.jpeg'); @endphp
+        @if (file_exists($logoPath))
+            <img src="{{ 'file://' . $logoPath }}" alt="Logo">
         @endif
         <div class="nom">CHAP-CHAP</div>
         <div class="sub">Boucherie & Transformation de Volailles</div>
