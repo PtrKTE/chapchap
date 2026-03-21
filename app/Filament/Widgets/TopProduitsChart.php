@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
+use App\Traits\WidgetVisibleParProfil;
 use App\Models\Produit;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
@@ -19,6 +20,8 @@ use Illuminate\Support\Carbon;
  */
 class TopProduitsChart extends ChartWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?string $heading = 'Top 5 produits — mois en cours';
 
     protected static ?int $sort = 4;
@@ -29,9 +32,7 @@ class TopProduitsChart extends ChartWidget
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [Profil::GERANT, Profil::RESP_OPERATIONS]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS]);
     }
 
     protected function getData(): array

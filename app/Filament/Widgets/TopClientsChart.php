@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
+use App\Traits\WidgetVisibleParProfil;
 use App\Models\Client;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
@@ -19,6 +20,8 @@ use Illuminate\Support\Carbon;
  */
 class TopClientsChart extends ChartWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?string $heading = 'Top 5 clients — mois en cours';
 
     protected static ?int $sort = 3;
@@ -29,9 +32,7 @@ class TopClientsChart extends ChartWidget
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [Profil::GERANT, Profil::RESP_OPERATIONS, Profil::COMMERCIAL]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS, Profil::COMMERCIAL]);
     }
 
     protected function getData(): array

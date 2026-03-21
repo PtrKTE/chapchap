@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
+use App\Traits\WidgetVisibleParProfil;
 use App\Enums\StatutProduction;
 use App\Models\Production;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -23,19 +24,15 @@ use Illuminate\Support\Carbon;
  */
 class ProductionStatsWidget extends BaseWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?int $sort = 7;
 
     protected static ?string $pollingInterval = '60s';
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [
-            Profil::GERANT,
-            Profil::RESP_OPERATIONS,
-            Profil::AGENT_PRODUCTION,
-        ]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS, Profil::AGENT_PRODUCTION]);
     }
 
     protected function getStats(): array

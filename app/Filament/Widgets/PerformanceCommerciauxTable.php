@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
+use App\Traits\WidgetVisibleParProfil;
 use App\Models\User;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,6 +29,8 @@ use Illuminate\Support\Carbon;
  */
 class PerformanceCommerciauxTable extends BaseWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?string $heading = 'Performance commerciaux — mois en cours';
 
     protected int|string|array $columnSpan = 'full';
@@ -36,13 +39,7 @@ class PerformanceCommerciauxTable extends BaseWidget
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [
-            Profil::GERANT,
-            Profil::RESP_OPERATIONS,
-            Profil::COMMERCIAL,
-        ]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS, Profil::COMMERCIAL]);
     }
 
     public function table(Table $table): Table

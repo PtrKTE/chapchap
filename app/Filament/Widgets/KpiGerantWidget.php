@@ -6,6 +6,7 @@ namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
 use App\Models\Vente;
+use App\Traits\WidgetVisibleParProfil;
 use App\Models\VenteLigne;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -24,6 +25,8 @@ use Illuminate\Support\Carbon;
  */
 class KpiGerantWidget extends BaseWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?int $sort = -3;
 
     // Rafraîchissement automatique toutes les 30 secondes
@@ -31,9 +34,7 @@ class KpiGerantWidget extends BaseWidget
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [Profil::GERANT, Profil::RESP_OPERATIONS]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS]);
     }
 
     protected function getStats(): array

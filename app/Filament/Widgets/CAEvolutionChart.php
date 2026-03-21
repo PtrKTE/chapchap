@@ -6,6 +6,7 @@ namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
 use App\Models\Vente;
+use App\Traits\WidgetVisibleParProfil;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
@@ -20,6 +21,8 @@ use Illuminate\Support\Carbon;
  */
 class CAEvolutionChart extends ChartWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?string $heading = 'Evolution du CA — 30 derniers jours';
 
     protected static ?int $sort = -2;
@@ -30,9 +33,7 @@ class CAEvolutionChart extends ChartWidget
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [Profil::GERANT, Profil::RESP_OPERATIONS]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS]);
     }
 
     protected function getData(): array

@@ -6,6 +6,7 @@ namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
 use App\Models\StockEmplacement;
+use App\Traits\WidgetVisibleParProfil;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -21,6 +22,8 @@ use Filament\Widgets\TableWidget as BaseWidget;
  */
 class AlerteStockWidget extends BaseWidget
 {
+    use WidgetVisibleParProfil;
+
     // Titre du widget affiché en haut
     protected static ?string $heading = 'Alertes stock bas';
 
@@ -31,13 +34,7 @@ class AlerteStockWidget extends BaseWidget
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [
-            Profil::GERANT,
-            Profil::RESP_OPERATIONS,
-            Profil::GESTIONNAIRE_STOCK,
-        ]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS, Profil::GESTIONNAIRE_STOCK]);
     }
 
     public function table(Table $table): Table

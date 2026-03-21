@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
+use App\Traits\WidgetVisibleParProfil;
 use App\Models\StockEmplacement;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -19,17 +20,13 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
  */
 class StockOverviewWidget extends BaseWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?int $sort = 9;
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [
-            Profil::GERANT,
-            Profil::RESP_OPERATIONS,
-            Profil::GESTIONNAIRE_STOCK,
-        ]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS, Profil::GESTIONNAIRE_STOCK]);
     }
 
     protected function getStats(): array

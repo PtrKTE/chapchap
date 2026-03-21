@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
+use App\Traits\WidgetVisibleParProfil;
 use App\Models\Charge;
 use App\Models\Paiement;
 use Filament\Widgets\ChartWidget;
@@ -23,6 +24,8 @@ use Illuminate\Support\Carbon;
  */
 class TresorerieChart extends ChartWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?string $heading = 'Trésorerie — 7 derniers jours';
 
     protected static ?int $sort = 6;
@@ -33,9 +36,7 @@ class TresorerieChart extends ChartWidget
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [Profil::GERANT, Profil::RESP_OPERATIONS]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS]);
     }
 
     protected function getData(): array

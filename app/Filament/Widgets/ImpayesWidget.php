@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\Profil;
+use App\Traits\WidgetVisibleParProfil;
 use App\Enums\StatutPaiement;
 use App\Models\Vente;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -23,15 +24,15 @@ use Illuminate\Support\Carbon;
  */
 class ImpayesWidget extends BaseWidget
 {
+    use WidgetVisibleParProfil;
+
     protected static ?int $sort = 5;
 
     protected static ?string $pollingInterval = '60s';
 
     public static function canView(): bool
     {
-        $profil = auth()->user()?->profil;
-
-        return in_array($profil, [Profil::GERANT, Profil::RESP_OPERATIONS, Profil::COMMERCIAL]);
+        return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS, Profil::COMMERCIAL]);
     }
 
     protected function getStats(): array
