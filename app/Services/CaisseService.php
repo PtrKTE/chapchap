@@ -122,7 +122,7 @@ class CaisseService
         float $depotWaveMtn = 0,
         float $depotCheque = 0,
     ): Caisse {
-        if ($caisse->statut === StatutCaisse::VALIDEE->value) {
+        if ($caisse->statut === StatutCaisse::VALIDEE) {
             throw new \RuntimeException('Impossible de modifier une caisse déjà validée.');
         }
 
@@ -149,7 +149,7 @@ class CaisseService
      */
     public function cloturer(Caisse $caisse): Caisse
     {
-        if ($caisse->statut !== StatutCaisse::OUVERTE->value) {
+        if ($caisse->statut !== StatutCaisse::OUVERTE) {
             throw new \RuntimeException('Seule une caisse ouverte peut être clôturée.');
         }
 
@@ -167,7 +167,7 @@ class CaisseService
      */
     public function valider(Caisse $caisse, int $validateurId): Caisse
     {
-        if ($caisse->statut !== StatutCaisse::CLOTUREE->value) {
+        if ($caisse->statut !== StatutCaisse::CLOTUREE) {
             throw new \RuntimeException('Seule une caisse clôturée peut être validée.');
         }
 
