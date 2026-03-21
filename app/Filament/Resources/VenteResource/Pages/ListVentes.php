@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\VenteResource\Pages;
 
+use App\Enums\CategorieProduit;
 use App\Exports\VentesExport;
 use App\Filament\Resources\VenteResource;
 use App\Models\Vente;
@@ -67,6 +68,18 @@ class ListVentes extends ListRecords
                 ->badge(Vente::where('annulee', true)->count())
                 ->badgeColor('gray')
                 ->modifyQueryUsing(fn (Builder $q) => $q->where('annulee', true)),
+
+            'viande' => Tab::make('Viande')
+                ->badge(
+                    Vente::where('annulee', false)
+                        ->whereHas('lignes.produit', fn (Builder $q) => $q->where('categorie', CategorieProduit::VIANDE->value))
+                        ->count()
+                )
+                ->badgeColor('danger')
+                ->modifyQueryUsing(fn (Builder $q) => $q
+                    ->where('annulee', false)
+                    ->whereHas('lignes.produit', fn (Builder $q) => $q->where('categorie', CategorieProduit::VIANDE->value))
+                ),
         ];
     }
 

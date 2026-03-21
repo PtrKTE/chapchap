@@ -148,8 +148,9 @@ class EauProductionResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->label('Voir'),
+                Tables\Actions\EditAction::make()->label('Modifier'),
+                Tables\Actions\DeleteAction::make()->label('Supprimer'),
             ])
             ->bulkActions([]);
     }
@@ -162,9 +163,10 @@ class EauProductionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEauProductions::route('/'),
+            'index'  => Pages\ListEauProductions::route('/'),
             'create' => Pages\CreateEauProduction::route('/create'),
-            'edit' => Pages\EditEauProduction::route('/{record}/edit'),
+            'view'   => Pages\ViewEauProduction::route('/{record}'),
+            'edit'   => Pages\EditEauProduction::route('/{record}/edit'),
         ];
     }
 }
