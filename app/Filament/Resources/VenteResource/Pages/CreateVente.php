@@ -17,12 +17,11 @@ use Illuminate\Support\Facades\Log;
 /**
  * Page de création d'une vente.
  *
- * À la création :
- * 1. Génère le numéro de reçu automatiquement (REC-YYYYMMDD-XXX)
- * 2. Calcule les totaux (montant_total, montant_net, montant_restant)
- * 3. Détermine le statut de paiement (payé, partiel, crédit)
- * 4. Décrémente le stock via StockService pour chaque ligne
- * 5. Enregistre le paiement initial si montant_recu > 0
+ * Filament 3 avec ->relationship() sur le Repeater sauvegarde d'abord
+ * l'enregistrement parent, PUIS les lignes enfants.
+ * → Les totaux NE PEUVENT PAS être calculés dans mutateFormDataBeforeCreate
+ *   (les lignes n'existent pas encore en BDD à ce stade).
+ * → On calcule les totaux dans afterCreate(), une fois les lignes sauvegardées.
  */
 class CreateVente extends CreateRecord
 {
@@ -30,59 +29,76 @@ class CreateVente extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // 1. Numéro de reçu auto : REC-YYYYMMDD-XXX
+        // Numéro de reçu auto : REC-YYYYMMDD-XXX
         $date = now()->format('Ymd');
         $count = Vente::whereDate('date_vente', today())->count() + 1;
         $data['numero_recu'] = sprintf('REC-%s-%03d', $date, $count);
 
-        // 2. Utilisateur connecté
+        // Utilisateur connecté
         $data['created_by'] = auth()->id();
 
-        // 3. Calculer les totaux à partir des lignes
-        $lignes = $data['lignes'] ?? [];
-        $montantTotal = collect($lignes)->sum(fn($l) => (float) ($l['montant_ligne'] ?? 0));
-        $remise = (float) ($data['remise'] ?? 0);
-        $montantNet = max(0, $montantTotal - $remise);
-        $montantRecu = (float) ($data['montant_recu'] ?? 0);
-        $montantRestant = max(0, $montantNet - $montantRecu);
-
-        $data['montant_total'] = round($montantTotal, 2);
-        $data['montant_net'] = round($montantNet, 2);
-        $data['montant_restant'] = round($montantRestant, 2);
-        $data['annulee'] = false;
-
-        // 4. Déterminer le statut paiement
-        if ($montantNet <= 0) {
-            $data['statut_paiement'] = StatutPaiement::PAYE->value;
-        } elseif ($montantRecu <= 0) {
-            $data['statut_paiement'] = StatutPaiement::CREDIT->value;
-        } elseif ($montantRecu < $montantNet) {
-            $data['statut_paiement'] = StatutPaiement::PARTIEL->value;
-        } else {
-            $data['statut_paiement'] = StatutPaiement::PAYE->value;
-            $data['date_reglement_complet'] = now()->toDateString();
-        }
+        // Valeurs provisoires — seront recalculées dans afterCreate()
+        // une fois que Filament aura sauvegardé les lignes de la relation
+        $data['montant_total']    = 0;
+        $data['montant_net']      = 0;
+        $data['montant_restant']  = 0;
+        $data['statut_paiement']  = StatutPaiement::CREDIT->value;
+        $data['annulee']          = false;
 
         return $data;
     }
 
     /**
-     * Après la création de la vente : décrémente le stock et enregistre le paiement.
+     * Après création : les lignes sont maintenant en BDD.
      *
-     * Toutes les opérations stock + paiement sont dans une transaction DB :
-     * si une sortie de stock échoue, aucune sortie n'est enregistrée
-     * (la vente reste créée mais sans impact stock — notification d'erreur).
+     * On peut donc :
+     * 1. Recalculer les vrais totaux depuis les lignes sauvegardées
+     * 2. Décrémenter le stock via StockService
+     * 3. Enregistrer le paiement initial
      */
     protected function afterCreate(): void
     {
         $vente = $this->record;
 
+        // ── Étape 1 : recalcul des totaux depuis les lignes réelles ──────────
+        $lignes = $vente->lignes()->get();
+
+        $montantTotal   = (float) $lignes->sum('montant_ligne');
+        $remise         = (float) $vente->remise;
+        $montantNet     = max(0, $montantTotal - $remise);
+        $montantRecu    = (float) $vente->montant_recu;
+        $montantRestant = max(0, $montantNet - $montantRecu);
+
+        // Déterminer le statut paiement correct
+        if ($montantNet <= 0) {
+            $statut = StatutPaiement::PAYE->value;
+        } elseif ($montantRecu <= 0) {
+            $statut = StatutPaiement::CREDIT->value;
+        } elseif ($montantRecu < $montantNet) {
+            $statut = StatutPaiement::PARTIEL->value;
+        } else {
+            $statut = StatutPaiement::PAYE->value;
+        }
+
+        $vente->update([
+            'montant_total'           => round($montantTotal, 2),
+            'montant_net'             => round($montantNet, 2),
+            'montant_restant'         => round($montantRestant, 2),
+            'statut_paiement'         => $statut,
+            'date_reglement_complet'  => $montantRestant <= 0 && $montantNet > 0
+                                            ? now()->toDateString()
+                                            : null,
+        ]);
+
+        // Recharger après mise à jour
+        $vente->refresh();
+
+        // ── Étape 2 : décrémenter le stock + enregistrer CMP sur les lignes ──
         try {
-            DB::transaction(function () use ($vente) {
+            DB::transaction(function () use ($vente, $lignes) {
                 $stockService = app(StockService::class);
 
-                // Décrémente le stock pour chaque ligne de vente
-                foreach ($vente->lignes()->with('produit')->get() as $ligne) {
+                foreach ($lignes as $ligne) {
                     $mouvement = $stockService->sortie(
                         produitId: $ligne->produit_id,
                         emplacementId: $vente->emplacement_id,
@@ -94,23 +110,23 @@ class CreateVente extends CreateRecord
                     // Enregistrer le CMP au moment de la vente sur la ligne
                     $ligne->update([
                         'cout_revient' => round((float) $mouvement->cout_unitaire, 4),
-                        'marge_ligne' => round(
-                            (float) $ligne->montant_ligne - ((float) $ligne->quantite * (float) $mouvement->cout_unitaire),
+                        'marge_ligne'  => round(
+                            (float) $ligne->montant_ligne
+                                - ((float) $ligne->quantite * (float) $mouvement->cout_unitaire),
                             2
                         ),
                     ]);
                 }
 
-                // Enregistrer le paiement initial si montant reçu > 0
-                $montantRecu = (float) $vente->montant_recu;
-                if ($montantRecu > 0) {
+                // ── Étape 3 : paiement initial si montant reçu > 0 ──────────
+                if ($vente->montant_recu > 0) {
                     Paiement::create([
-                        'vente_id' => $vente->id,
+                        'vente_id'      => $vente->id,
                         'date_paiement' => now(),
-                        'montant' => $montantRecu,
+                        'montant'       => (float) $vente->montant_recu,
                         'mode_paiement' => $vente->mode_paiement->value,
-                        'observations' => 'Paiement initial à la vente',
-                        'created_by' => auth()->id(),
+                        'observations'  => 'Paiement initial à la vente',
+                        'created_by'    => auth()->id(),
                     ]);
                 }
             });
@@ -128,6 +144,7 @@ class CreateVente extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return $this->getResource()::getUrl('edit', ['record' => $this->record]);
+        // Redirige vers la page de vue (ViewVente) après création
+        return $this->getResource()::getUrl('view', ['record' => $this->record]);
     }
 }

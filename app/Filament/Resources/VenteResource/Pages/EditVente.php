@@ -36,32 +36,51 @@ class EditVente extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         // Garantir que remise n'est jamais null
-        $data['remise'] = (float) ($data['remise'] ?? 0);
+        $data['remise']       = (float) ($data['remise'] ?? 0);
         $data['montant_recu'] = (float) ($data['montant_recu'] ?? 0);
 
-        // Recalculer les totaux à partir des lignes
-        $lignes = $data['lignes'] ?? [];
-        $montantTotal = collect($lignes)->sum(fn($l) => (float) ($l['montant_ligne'] ?? 0));
-        $montantNet = max(0, $montantTotal - $data['remise']);
-        $montantRestant = max(0, $montantNet - $data['montant_recu']);
+        // Les vrais totaux seront recalculés dans afterSave()
+        // depuis les lignes sauvegardées (même logique que CreateVente)
+        return $data;
+    }
 
-        $data['montant_total'] = round($montantTotal, 2);
-        $data['montant_net'] = round($montantNet, 2);
-        $data['montant_restant'] = round($montantRestant, 2);
+    /**
+     * Après la sauvegarde : recalcul des totaux depuis les lignes réelles en BDD.
+     *
+     * Même raison que CreateVente : avec ->relationship() sur le Repeater,
+     * Filament sauvegarde les lignes après le parent. afterSave() s'exécute
+     * après les deux, donc les lignes sont disponibles.
+     */
+    protected function afterSave(): void
+    {
+        $vente = $this->record->fresh();
 
-        // Recalculer le statut paiement
+        $lignes         = $vente->lignes()->get();
+        $montantTotal   = (float) $lignes->sum('montant_ligne');
+        $remise         = (float) $vente->remise;
+        $montantNet     = max(0, $montantTotal - $remise);
+        $montantRecu    = (float) $vente->montant_recu;
+        $montantRestant = max(0, $montantNet - $montantRecu);
+
         if ($montantNet <= 0) {
-            $data['statut_paiement'] = StatutPaiement::PAYE->value;
-        } elseif ($data['montant_recu'] <= 0) {
-            $data['statut_paiement'] = StatutPaiement::CREDIT->value;
-        } elseif ($data['montant_recu'] < $montantNet) {
-            $data['statut_paiement'] = StatutPaiement::PARTIEL->value;
+            $statut = StatutPaiement::PAYE->value;
+        } elseif ($montantRecu <= 0) {
+            $statut = StatutPaiement::CREDIT->value;
+        } elseif ($montantRecu < $montantNet) {
+            $statut = StatutPaiement::PARTIEL->value;
         } else {
-            $data['statut_paiement'] = StatutPaiement::PAYE->value;
-            $data['date_reglement_complet'] = now()->toDateString();
+            $statut = StatutPaiement::PAYE->value;
         }
 
-        return $data;
+        $vente->updateQuietly([
+            'montant_total'          => round($montantTotal, 2),
+            'montant_net'            => round($montantNet, 2),
+            'montant_restant'        => round($montantRestant, 2),
+            'statut_paiement'        => $statut,
+            'date_reglement_complet' => $montantRestant <= 0 && $montantNet > 0
+                                            ? now()->toDateString()
+                                            : null,
+        ]);
     }
 
     protected function getHeaderActions(): array
