@@ -28,8 +28,6 @@ class ViandeStatsWidget extends StatsOverviewWidget
 
     protected static ?int $sort = 6;
 
-    protected static ?string $heading = 'Activité Viande';
-
     public static function canView(): bool
     {
         return static::visiblePour([Profil::GERANT, Profil::RESP_OPERATIONS]);
