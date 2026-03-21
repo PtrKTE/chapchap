@@ -158,6 +158,27 @@
 
 ==============================================================
 
+## MODULE EAU + VIANDE — S8 ✅
+--------------------------------------------------------------
+
+### Eau en sachet
+- ViewEauProduction : page de consultation + action Modifier
+- EauStatsWidget : 4 KPI (production mois/jour, sachets, énergie kWh)
+- ListEauProductions : onglets Toutes / Aujourd'hui / Ce mois / Cette semaine
+- EauProductionResource : ajout route view + Delete dans table
+
+### Viande (module complémentaire via Ventes)
+- ViandeStatsWidget : CA mois, volume kg, marge brute (dashboard global, sort=6)
+- ListVentes : onglet "Viande" filtrant les ventes avec produits categorie=viande
+
+### Fix déploiement
+- ViandeStatsWidget : $heading déclaré static → incompatible avec Filament VPS
+  Fix : suppression de la propriété static $heading (commit 2cfe770)
+
+### Commits : f95c775 / 2cfe770
+
+==============================================================
+
 ## ÉTAT GLOBAL DU PROJET
 --------------------------------------------------------------
 
@@ -170,12 +191,12 @@
 | S5    | Module Stock                      | ✅ Terminé    |
 | S6    | CRM + Ventes + Reçu PDF           | ✅ Terminé    |
 | S7    | Caisse + Charges                  | ✅ Terminé    |
-| S8    | Eau + Viande                      | ⏳ À venir    |
+| S8    | Eau + Viande                      | ✅ Terminé    |
 | S9    | Dashboards KPI                    | ✅ Terminé    |
 | S10   | Import/Export                     | ⏳ À venir    |
 | S11   | Recettage + Tests                 | ⏳ À venir    |
 | S12   | Déploiement final                 | ✅ Fait       |
 
 ==============================================================
-  Prochaine étape : S8 — Modules complémentaires (Eau + Viande)
+  Prochaine étape : S10 — Import/Export ou S11 — Recettage
 ==============================================================
