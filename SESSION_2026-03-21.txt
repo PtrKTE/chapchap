@@ -1,0 +1,118 @@
+==============================================================
+  CHAPCHAP — Récapitulatif de session du 21 mars 2026
+==============================================================
+
+## DÉPLOIEMENT EN PRODUCTION (Phases 4 à 6)
+--------------------------------------------------------------
+
+### Infrastructure serveur
+- VPS Hestia : vps114082.serveur-vps.net
+- OS : Ubuntu 22.04
+- PHP : 8.3.30
+- MariaDB / MySQL : actif
+- Node.js : 20 LTS
+
+### Domaine & SSL
+- URL production : https://app.chapchap-ci.com/admin
+- SSL Let's Encrypt : activé et valide
+
+### Problèmes résolus durant le déploiement
+
+1. open_basedir restriction (HTTP 500)
+   - Cause : Hestia limitait PHP au dossier public_html/
+     mais le projet est dans project/ (hors des chemins autorisés)
+   - Fix : ajout de /home/Tetchi/web/app.chapchap-ci.com/project
+     dans /etc/php/8.3/fpm/pool.d/app.chapchap-ci.com.conf
+   - Commande : systemctl restart php8.3-fpm
+
+2. RolePermissionSeeder échoue (rôle 'gerant' inexistant)
+   - Cause : shield:generate crée les permissions mais pas les rôles métier
+   - Fix : création manuelle via tinker
+     $roles = ['gerant','resp_operations','gestionnaire_stock',
+               'agent_production','commercial'];
+     foreach($roles as $r) { Role::firstOrCreate([...]) }
+
+3. super_admin non assigné (403 Forbidden)
+   - Fix : php8.3 artisan shield:super-admin --user=1
+           php8.3 artisan shield:generate --all --force
+
+4. git pull "dubious ownership"
+   - Cause : deploy.sh lancé en root alors que le projet appartient à Tetchi
+   - Fix : git config --global --add safe.directory [path]
+
+### Services en production
+- Cron Laravel : actif (toutes les minutes)
+  crontab -l → * * * * * php8.3 artisan schedule:run
+- Queue Worker : service systemd chapchap-queue (actif)
+  systemctl status chapchap-queue
+
+### Script de déploiement
+- Fichier : /home/Tetchi/web/app.chapchap-ci.com/project/deploy.sh
+- Usage : cd [project] && ./deploy.sh
+- Étapes : git pull → composer → npm build → migrate → cache → queue restart
+
+### Accès production
+- URL     : https://app.chapchap-ci.com/admin
+- Email   : patrick.tetchi@cpf-afrique.com
+- Rôle    : super_admin (223 permissions)
+
+==============================================================
+
+## MODULE LOTS — S3 (Phases développement)
+--------------------------------------------------------------
+
+### Fichiers créés / modifiés
+- app/Filament/Resources/LotResource/Pages/ViewLot.php   [NOUVEAU]
+- app/Filament/Resources/LotResource/Pages/ListLots.php  [MODIFIÉ]
+- app/Filament/Resources/LotResource/Widgets/LotStatsWidget.php [NOUVEAU]
+- app/Filament/Resources/LotResource.php                 [MODIFIÉ]
+
+### Fonctionnalités ajoutées
+1. Page ViewLot (détail d'un lot)
+   - Infolist complet : réception, quantités, coûts, facturation
+   - Bouton "Modifier"
+   - Action "Enregistrer un règlement" (avec formulaire modal)
+     → montant versé + mode paiement + date
+     → recalcul automatique du statut (non_reglee / partielle / reglee)
+     → notification de confirmation
+
+2. Onglets de filtrage rapide (ListLots)
+   - Tous | Non réglées | Partielles | Réglées
+   - Avec compteurs en temps réel
+
+3. Widget de statistiques (LotStatsWidget)
+   - Lots ce mois
+   - Poulets utilisables ce mois
+   - Coût total achats ce mois
+   - Impayés fournisseurs (toutes périodes)
+
+### Commit Git
+- Hash    : d5e8c3c
+- Message : feat: S3 — Module Lots complet (ViewLot + action règlement + stats widget + onglets)
+- Branch  : main
+- Repo    : https://github.com/PtrKTE/chapchap
+
+==============================================================
+
+## ÉTAT GLOBAL DU PROJET
+--------------------------------------------------------------
+
+| Phase | Contenu                           | Statut     |
+|-------|-----------------------------------|------------|
+| S1    | Setup Laravel + Filament + Auth   | ✅ Terminé |
+| S2    | BDD + Models + Resources de base  | ✅ Terminé |
+| S3    | Module Lots/Achats                | ✅ Terminé |
+| S4    | Module Production                 | 🔜 Suivant |
+| S5    | Module Stock                      | ⏳ À venir |
+| S6    | CRM + Ventes                      | ⏳ À venir |
+| S7    | Caisse + Charges                  | ⏳ À venir |
+| S8    | Eau + Viande                      | ⏳ À venir |
+| S9    | Dashboards KPI                    | ⏳ À venir |
+| S10   | Import/Export                     | ⏳ À venir |
+| S11   | Recettage + Tests                 | ⏳ À venir |
+| S12   | Déploiement final                 | ✅ Fait    |
+
+==============================================================
+  Prochaine session : S4 — Module Production
+  (CRUD Productions + lignes + rendement + génération stock)
+==============================================================

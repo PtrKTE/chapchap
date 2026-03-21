@@ -302,9 +302,10 @@ class ProductionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductions::route('/'),
+            'index'  => Pages\ListProductions::route('/'),
             'create' => Pages\CreateProduction::route('/create'),
-            'edit' => Pages\EditProduction::route('/{record}/edit'),
+            'view'   => Pages\ViewProduction::route('/{record}'),
+            'edit'   => Pages\EditProduction::route('/{record}/edit'),
         ];
     }
 }
