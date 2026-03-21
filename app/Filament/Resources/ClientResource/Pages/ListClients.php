@@ -69,6 +69,19 @@ class ListClients extends ListRecords
                     'clients_' . now()->format('Y-m-d') . '.xlsx'
                 )),
 
+            // Télécharger le modèle Excel pour l'import
+            Actions\Action::make('modele_import')
+                ->label('Modèle import')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('gray')
+                ->action(function () {
+                    // Génère un fichier Excel avec les colonnes attendues + 2 exemples
+                    return \Maatwebsite\Excel\Facades\Excel::download(
+                        new \App\Exports\ClientsImportTemplateExport(),
+                        'modele_import_clients.xlsx'
+                    );
+                }),
+
             // Import Excel
             Actions\Action::make('import_excel')
                 ->label('Importer')

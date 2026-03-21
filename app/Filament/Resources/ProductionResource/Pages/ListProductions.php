@@ -4,22 +4,36 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductionResource\Pages;
 
+use App\Exports\ProductionsExport;
 use App\Filament\Resources\ProductionResource;
 use App\Models\Production;
+use App\Traits\ExportableParDates;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ListProductions extends ListRecords
 {
+    use ExportableParDates;
+
     protected static string $resource = ProductionResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()->label('Nouvelle production'),
+            $this->actionExportExcel('Exporter productions'),
         ];
+    }
+
+    protected function telechargerExport(?string $dateDebut, ?string $dateFin)
+    {
+        return Excel::download(
+            new ProductionsExport($dateDebut, $dateFin),
+            'productions_' . now()->format('Y-m-d') . '.xlsx'
+        );
     }
 
     /**
