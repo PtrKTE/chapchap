@@ -19,37 +19,19 @@
 ### Problèmes résolus durant le déploiement
 
 1. open_basedir restriction (HTTP 500)
-   - Cause : Hestia limitait PHP au dossier public_html/
-     mais le projet est dans project/ (hors des chemins autorisés)
    - Fix : ajout de /home/Tetchi/web/app.chapchap-ci.com/project
      dans /etc/php/8.3/fpm/pool.d/app.chapchap-ci.com.conf
-   - Commande : systemctl restart php8.3-fpm
 
 2. RolePermissionSeeder échoue (rôle 'gerant' inexistant)
-   - Cause : shield:generate crée les permissions mais pas les rôles métier
-   - Fix : création manuelle via tinker
-     $roles = ['gerant','resp_operations','gestionnaire_stock',
-               'agent_production','commercial'];
-     foreach($roles as $r) { Role::firstOrCreate([...]) }
+   - Fix : création manuelle via tinker + shield:super-admin --user=1
 
-3. super_admin non assigné (403 Forbidden)
-   - Fix : php8.3 artisan shield:super-admin --user=1
-           php8.3 artisan shield:generate --all --force
-
-4. git pull "dubious ownership"
-   - Cause : deploy.sh lancé en root alors que le projet appartient à Tetchi
+3. git pull "dubious ownership"
    - Fix : git config --global --add safe.directory [path]
 
 ### Services en production
 - Cron Laravel : actif (toutes les minutes)
-  crontab -l → * * * * * php8.3 artisan schedule:run
 - Queue Worker : service systemd chapchap-queue (actif)
-  systemctl status chapchap-queue
-
-### Script de déploiement
-- Fichier : /home/Tetchi/web/app.chapchap-ci.com/project/deploy.sh
-- Usage : cd [project] && ./deploy.sh
-- Étapes : git pull → composer → npm build → migrate → cache → queue restart
+- Script deploy.sh : /home/Tetchi/web/app.chapchap-ci.com/project/deploy.sh
 
 ### Accès production
 - URL     : https://app.chapchap-ci.com/admin
@@ -58,90 +40,74 @@
 
 ==============================================================
 
-## MODULE LOTS — S3
+## MODULE LOTS — S3 ✅
 --------------------------------------------------------------
-
-### Fichiers créés / modifiés
-- app/Filament/Resources/LotResource/Pages/ViewLot.php          [NOUVEAU]
-- app/Filament/Resources/LotResource/Pages/ListLots.php         [MODIFIÉ]
-- app/Filament/Resources/LotResource/Widgets/LotStatsWidget.php [NOUVEAU]
-- app/Filament/Resources/LotResource.php                        [MODIFIÉ]
-
-### Fonctionnalités
-1. Page ViewLot — infolist + bouton Modifier + action "Enregistrer un règlement"
-2. Onglets : Tous | Non réglées | Partielles | Réglées (avec compteurs)
-3. Widget stats : Lots ce mois / Poulets utilisables / Coût total / Impayés
-
-### Commit : d5e8c3c
+- ViewLot : infolist + "Enregistrer un règlement"
+- ListLots : onglets Tous / Non réglées / Partielles / Réglées + LotStatsWidget
+- Commit : d5e8c3c
 
 ==============================================================
 
-## MODULE PRODUCTION — S4
+## MODULE PRODUCTION — S4 ✅
 --------------------------------------------------------------
-
-### Fichiers créés / modifiés
-- app/Filament/Resources/ProductionResource/Pages/ViewProduction.php          [NOUVEAU]
-- app/Filament/Resources/ProductionResource/Pages/ListProductions.php         [MODIFIÉ]
-- app/Filament/Resources/ProductionResource/Widgets/ProductionStatsWidget.php [NOUVEAU]
-- app/Filament/Resources/ProductionResource.php                               [MODIFIÉ]
-
-### Fonctionnalités
-1. Page ViewProduction — infolist + boutons Modifier / Valider / Annuler
-2. Action "Valider la production" → génère entrées stock (entree_production)
-   → calcul coût unitaire par kg (prorata poids total)
-   → calcul rendement = valorisation vente / coût matière
-   → décrément quantite_utilisable du lot
-3. Onglets : Toutes | En cours | Validées | Annulées
-4. Widget stats : Productions ce mois / Poulets abattus / Rendement moyen / En attente
-
-### Flux validé en production
-- Lot LOT-20260321-001 : 2000 poulets, 3 050 000 FCFA
-- Production PROD-20260321-001 : 1000 poulets traités, Rendement 382.7%
-- 4 produits mis en stock automatiquement
-
-### Commit : 90820c5
+- ViewProduction : infolist + Valider / Annuler → génère stock auto
+- ListProductions : onglets + ProductionStatsWidget
+- Flux validé : Lot → Production → Stock mis à jour automatiquement
+- Commit : 90820c5
 
 ==============================================================
 
-## MODULE STOCK — S5
+## MODULE STOCK — S5 ✅
 --------------------------------------------------------------
-
-### Fichiers créés / modifiés
-- app/Filament/Resources/TransfertResource/Pages/ViewTransfert.php      [NOUVEAU]
-- app/Filament/Resources/TransfertResource/Pages/ListTransferts.php     [MODIFIÉ]
-- app/Filament/Resources/TransfertResource.php                          [MODIFIÉ]
-- app/Filament/Resources/InventaireResource/Pages/ViewInventaire.php    [NOUVEAU]
-- app/Filament/Resources/InventaireResource/Pages/ListInventaires.php   [MODIFIÉ]
-- app/Filament/Resources/InventaireResource.php                         [MODIFIÉ]
-- app/Filament/Resources/StockEmplacementResource/Widgets/StockStatsWidget.php [NOUVEAU]
-- app/Filament/Resources/StockEmplacementResource/Pages/ListStockEmplacements.php [MODIFIÉ]
-
-### Fonctionnalités
-1. ViewTransfert : action "Réceptionner" → StockService::transfert()
-   → sortie sur emplacement source + entrée sur emplacement destination
-   → statut passe à RECU
-2. ViewInventaire : action "Comptage terminé" + "Valider l'inventaire"
-   → validerInventaire() vérifie justifications si écart ≠ 0
-   → appelle StockService::ajustementInventaire() pour chaque ligne
-   → statut passe à VALIDE
-3. ListTransferts : onglets Tous / En cours / Reçus / Annulés
-4. ListInventaires : onglets Tous / En cours / Terminés / Validés
-5. StockStatsWidget : 4 KPI (Valeur totale, En stock, Alertes, Ruptures)
-
-### Déploiement : ✅ Réussi
+- ViewTransfert : action "Réceptionner" → StockService::transfert()
+- ViewInventaire : action "Valider l'inventaire" → StockService::ajustementInventaire()
+- Onglets Transferts + Inventaires
+- StockStatsWidget : 4 KPI (Valeur totale, En stock, Alertes, Ruptures)
+- Déploiement : ✅ Réussi
 
 ==============================================================
 
-## MODULE CRM + VENTES — S6 (EN COURS)
+## MODULE CRM + VENTES — S6 ✅
+--------------------------------------------------------------
+
+### Fichiers créés / modifiés
+- app/Filament/Resources/VenteResource/Pages/ViewVente.php       [NOUVEAU]
+- app/Filament/Resources/VenteResource/Widgets/VenteStatsWidget.php [NOUVEAU]
+- app/Filament/Resources/VenteResource/Pages/ListVentes.php      [MODIFIÉ]
+- app/Filament/Resources/VenteResource.php                       [MODIFIÉ]
+- app/Filament/Resources/ClientResource/Pages/ViewClient.php     [NOUVEAU]
+- app/Filament/Resources/ClientResource/Widgets/ClientStatsWidget.php [NOUVEAU]
+- app/Filament/Resources/ClientResource/Pages/ListClients.php    [MODIFIÉ]
+- app/Filament/Resources/ClientResource.php                      [MODIFIÉ]
+- app/Models/Client.php                                          [MODIFIÉ]
+- routes/web.php                                                 [MODIFIÉ]
+
+### Fonctionnalités
+1. ViewVente : Encaisser / Réglé patronne / Annuler (reverse stock) / Imprimer reçu
+2. VenteStatsWidget : CA jour / CA mois / Impayés / Ventes à crédit
+3. ListVentes : onglets Toutes / Crédit / Partielles / Payées / Annulées
+4. ViewClient : fiche client + résumé financier + 10 dernières ventes
+5. ClientStatsWidget : Actifs / Avec impayés / Total impayés / Nouveaux ce mois
+6. ListClients : onglets Tous / Actifs / Avec impayés / Inactifs
+
+### Reçu PDF — mPDF ✅
+- Basculé de DomPDF vers mPDF (mpdf/mpdf ^8.3)
+- DomPDF bloquait sur le VPS (open_basedir /tmp inaccessible)
+- mPDF configuré avec tempDir = storage/app/mpdf-tmp (dans open_basedir)
+- Résultat : génération < 1 seconde, logo + produits + statut OK
+- Commits : 858ff5c / a0f897e / a684a7f / 6a37914
+
+==============================================================
+
+## MODULE CAISSE + CHARGES — S7 (EN COURS)
 --------------------------------------------------------------
 
 ### À développer
-- ClientResource : CRUD clients B2B + particuliers
-- VenteResource : saisie vente (Filament) + lignes produits
-- VenteService : décrément stock + calcul marges CMP
-- PaiementResource : encaissements partiels / suivi crédit
-- Reçu PDF : barryvdh/laravel-dompdf
-- Onglets + Stats widgets pour ventes
+- CaisseResource : journal caisse journalier + clôture
+- ChargeResource : saisie dépenses par catégorie
+- CaisseService : calcul solde, écart, versements
+- Rapport caisse PDF (mPDF)
+- Onglets + Stats widgets
 
 ==============================================================
 
@@ -155,8 +121,8 @@
 | S3    | Module Lots/Achats                | ✅ Terminé    |
 | S4    | Module Production                 | ✅ Terminé    |
 | S5    | Module Stock                      | ✅ Terminé    |
-| S6    | CRM + Ventes                      | 🔄 En cours   |
-| S7    | Caisse + Charges                  | ⏳ À venir    |
+| S6    | CRM + Ventes + Reçu PDF           | ✅ Terminé    |
+| S7    | Caisse + Charges                  | 🔄 En cours   |
 | S8    | Eau + Viande                      | ⏳ À venir    |
 | S9    | Dashboards KPI                    | ⏳ À venir    |
 | S10   | Import/Export                     | ⏳ À venir    |
@@ -164,5 +130,5 @@
 | S12   | Déploiement final                 | ✅ Fait       |
 
 ==============================================================
-  Session en cours : S6 — CRM + Ventes
+  Session en cours : S7 — Caisse + Charges
 ==============================================================

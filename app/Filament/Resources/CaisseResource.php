@@ -329,9 +329,10 @@ class CaisseResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCaisses::route('/'),
+            'index'  => Pages\ListCaisses::route('/'),
             'create' => Pages\CreateCaisse::route('/create'),
-            'edit' => Pages\EditCaisse::route('/{record}/edit'),
+            'view'   => Pages\ViewCaisse::route('/{record}'),
+            'edit'   => Pages\EditCaisse::route('/{record}/edit'),
         ];
     }
 
