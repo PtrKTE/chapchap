@@ -263,9 +263,10 @@ class TransfertResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTransferts::route('/'),
+            'index'  => Pages\ListTransferts::route('/'),
             'create' => Pages\CreateTransfert::route('/create'),
-            'edit' => Pages\EditTransfert::route('/{record}/edit'),
+            'view'   => Pages\ViewTransfert::route('/{record}'),
+            'edit'   => Pages\EditTransfert::route('/{record}/edit'),
         ];
     }
 }

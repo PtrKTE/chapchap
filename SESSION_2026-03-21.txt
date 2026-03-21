@@ -58,61 +58,89 @@
 
 ==============================================================
 
-## MODULE LOTS — S3 (Phases développement)
+## MODULE LOTS — S3
 --------------------------------------------------------------
 
 ### Fichiers créés / modifiés
-- app/Filament/Resources/LotResource/Pages/ViewLot.php   [NOUVEAU]
-- app/Filament/Resources/LotResource/Pages/ListLots.php  [MODIFIÉ]
+- app/Filament/Resources/LotResource/Pages/ViewLot.php          [NOUVEAU]
+- app/Filament/Resources/LotResource/Pages/ListLots.php         [MODIFIÉ]
 - app/Filament/Resources/LotResource/Widgets/LotStatsWidget.php [NOUVEAU]
-- app/Filament/Resources/LotResource.php                 [MODIFIÉ]
+- app/Filament/Resources/LotResource.php                        [MODIFIÉ]
 
-### Fonctionnalités ajoutées
-1. Page ViewLot (détail d'un lot)
-   - Infolist complet : réception, quantités, coûts, facturation
-   - Bouton "Modifier"
-   - Action "Enregistrer un règlement" (avec formulaire modal)
-     → montant versé + mode paiement + date
-     → recalcul automatique du statut (non_reglee / partielle / reglee)
-     → notification de confirmation
+### Fonctionnalités
+1. Page ViewLot — infolist + bouton Modifier + action "Enregistrer un règlement"
+2. Onglets : Tous | Non réglées | Partielles | Réglées (avec compteurs)
+3. Widget stats : Lots ce mois / Poulets utilisables / Coût total / Impayés
 
-2. Onglets de filtrage rapide (ListLots)
-   - Tous | Non réglées | Partielles | Réglées
-   - Avec compteurs en temps réel
+### Commit : d5e8c3c
 
-3. Widget de statistiques (LotStatsWidget)
-   - Lots ce mois
-   - Poulets utilisables ce mois
-   - Coût total achats ce mois
-   - Impayés fournisseurs (toutes périodes)
+==============================================================
 
-### Commit Git
-- Hash    : d5e8c3c
-- Message : feat: S3 — Module Lots complet (ViewLot + action règlement + stats widget + onglets)
-- Branch  : main
-- Repo    : https://github.com/PtrKTE/chapchap
+## MODULE PRODUCTION — S4
+--------------------------------------------------------------
+
+### Fichiers créés / modifiés
+- app/Filament/Resources/ProductionResource/Pages/ViewProduction.php          [NOUVEAU]
+- app/Filament/Resources/ProductionResource/Pages/ListProductions.php         [MODIFIÉ]
+- app/Filament/Resources/ProductionResource/Widgets/ProductionStatsWidget.php [NOUVEAU]
+- app/Filament/Resources/ProductionResource.php                               [MODIFIÉ]
+
+### Fonctionnalités
+1. Page ViewProduction — infolist + boutons Modifier / Valider / Annuler
+2. Action "Valider la production" → génère entrées stock (entree_production)
+   → calcul coût unitaire par kg (prorata poids total)
+   → calcul rendement = valorisation vente / coût matière
+   → décrément quantite_utilisable du lot
+3. Onglets : Toutes | En cours | Validées | Annulées
+4. Widget stats : Productions ce mois / Poulets abattus / Rendement moyen / En attente
+
+### Flux validé en production
+- Lot LOT-20260321-001 : 2000 poulets, 3 050 000 FCFA
+- Production PROD-20260321-001 : 1000 poulets traités, Rendement 382.7%
+- 4 produits mis en stock automatiquement
+
+### Commit : 90820c5
+
+==============================================================
+
+## MODULE STOCK — S5 (EN COURS)
+--------------------------------------------------------------
+
+### Déjà en place (S2)
+- StockService complet (entree, sortie, transfert, ajustementInventaire, CMP)
+- StockEmplacementResource (lecture seule, alertes stock bas, lien mouvements)
+- MouvementStockResource (liste + détail modal)
+- TransfertResource (CRUD + EditTransfert avec action "Réceptionner")
+- InventaireResource (CRUD + EditInventaire avec action "Valider")
+
+### À compléter (en cours)
+- ViewTransfert page (créée, à compléter)
+- ViewInventaire page (créée, à compléter)
+- StockStatsWidget pour liste stocks
+- Onglets ListTransferts (En cours / Reçus / Annulés)
+- Onglets ListInventaires (En cours / Terminé / Validé)
 
 ==============================================================
 
 ## ÉTAT GLOBAL DU PROJET
 --------------------------------------------------------------
 
-| Phase | Contenu                           | Statut     |
-|-------|-----------------------------------|------------|
-| S1    | Setup Laravel + Filament + Auth   | ✅ Terminé |
-| S2    | BDD + Models + Resources de base  | ✅ Terminé |
-| S3    | Module Lots/Achats                | ✅ Terminé |
-| S4    | Module Production                 | 🔜 Suivant |
-| S5    | Module Stock                      | ⏳ À venir |
-| S6    | CRM + Ventes                      | ⏳ À venir |
-| S7    | Caisse + Charges                  | ⏳ À venir |
-| S8    | Eau + Viande                      | ⏳ À venir |
-| S9    | Dashboards KPI                    | ⏳ À venir |
-| S10   | Import/Export                     | ⏳ À venir |
-| S11   | Recettage + Tests                 | ⏳ À venir |
-| S12   | Déploiement final                 | ✅ Fait    |
+| Phase | Contenu                           | Statut        |
+|-------|-----------------------------------|---------------|
+| S1    | Setup Laravel + Filament + Auth   | ✅ Terminé    |
+| S2    | BDD + Models + Resources de base  | ✅ Terminé    |
+| S3    | Module Lots/Achats                | ✅ Terminé    |
+| S4    | Module Production                 | ✅ Terminé    |
+| S5    | Module Stock                      | 🔄 En cours   |
+| S6    | CRM + Ventes                      | ⏳ À venir    |
+| S7    | Caisse + Charges                  | ⏳ À venir    |
+| S8    | Eau + Viande                      | ⏳ À venir    |
+| S9    | Dashboards KPI                    | ⏳ À venir    |
+| S10   | Import/Export                     | ⏳ À venir    |
+| S11   | Recettage + Tests                 | ⏳ À venir    |
+| S12   | Déploiement final                 | ✅ Fait       |
 
 ==============================================================
-  Prochaine session : S4 — Module Production
-  (CRUD Productions + lignes + rendement + génération stock)
+  Session en cours : S5 — Module Stock
+  (ViewTransfert + ViewInventaire + StockStats + onglets)
 ==============================================================

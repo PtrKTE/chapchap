@@ -264,9 +264,10 @@ class InventaireResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListInventaires::route('/'),
+            'index'  => Pages\ListInventaires::route('/'),
             'create' => Pages\CreateInventaire::route('/create'),
-            'edit' => Pages\EditInventaire::route('/{record}/edit'),
+            'view'   => Pages\ViewInventaire::route('/{record}'),
+            'edit'   => Pages\EditInventaire::route('/{record}/edit'),
         ];
     }
 }

@@ -17,15 +17,21 @@ class ListStockEmplacements extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // Export instantané du stock (pas de filtre date — c'est l'état actuel)
             Actions\Action::make('export_excel')
                 ->label('Exporter stock')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->action(fn() => Excel::download(
+                ->action(fn () => Excel::download(
                     new StockExport(),
                     'stock_' . now()->format('Y-m-d') . '.xlsx'
                 )),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            StockEmplacementResource\Widgets\StockStatsWidget::class,
         ];
     }
 }
