@@ -28,6 +28,12 @@
 3. git pull "dubious ownership"
    - Fix : git config --global --add safe.directory [path]
 
+4. Dashboard vide en production
+   - Cause : profil utilisateur non assigné sur le compte production
+   - Fix : assigner le profil "Gérant" via Utilisateurs → Modifier → Sauvegarder
+   - Prévention : trait WidgetVisibleParProfil — les super_admin voient
+     tous les widgets même sans profil métier assigné (commit bdf631d)
+
 ### Services en production
 - Cron Laravel : actif (toutes les minutes)
 - Queue Worker : service systemd chapchap-queue (actif)
@@ -37,6 +43,7 @@
 - URL     : https://app.chapchap-ci.com/admin
 - Email   : patrick.tetchi@cpf-afrique.com
 - Rôle    : super_admin (223 permissions)
+- Profil  : Gérant (obligatoire pour les widgets dashboard)
 
 ==============================================================
 
@@ -97,17 +104,57 @@
 - Résultat : génération < 1 seconde, logo + produits + statut OK
 - Commits : 858ff5c / a0f897e / a684a7f / 6a37914
 
+### Bug fix — Totaux vente = 0 ✅
+- Cause : Filament 3 Repeater ->relationship() sauvegarde les lignes APRÈS
+  le parent — mutateFormDataBeforeCreate ne peut pas calculer les totaux
+- Fix CreateVente : calcul dans afterCreate() depuis lignes réelles en BDD
+- Fix EditVente : calcul dans afterSave() via updateQuietly()
+- Commit : 82ecdc5
+
 ==============================================================
 
-## MODULE CAISSE + CHARGES — S7 (EN COURS)
+## MODULE CAISSE + CHARGES — S7 ✅
 --------------------------------------------------------------
 
-### À développer
-- CaisseResource : journal caisse journalier + clôture
-- ChargeResource : saisie dépenses par catégorie
-- CaisseService : calcul solde, écart, versements
-- Rapport caisse PDF (mPDF)
-- Onglets + Stats widgets
+### CaisseResource ✅
+- ViewCaisse : Recalculer / Clôturer / Valider / Rapport PDF (mPDF A4)
+- ListCaisses : onglets Toutes / Ouvertes / Clôturées / Validées
+- CaisseStatsWidget : 4 KPI (Encaissé mois / Décaissé mois / Solde net / Caisse du jour)
+- CaisseService : recalculer() / cloturer() / valider()
+
+### ChargeResource ✅
+- ListCharges : onglets Toutes / Aujourd'hui / Ce mois / Charges fixes / Variables
+- ChargeStatsWidget : 4 KPI (Dépenses mois / Dépenses jour / Top catégorie / Nb charges)
+- Commits : 4197258
+
+==============================================================
+
+## DASHBOARDS KPI — S9 ✅
+--------------------------------------------------------------
+
+### Widgets dashboard (auto-découverts, visibilité par profil)
+- KpiGerantWidget       : CA jour/semaine/mois + marge brute (Gérant, Resp.)
+- CAEvolutionChart      : Évolution CA + marge 30 jours (Gérant, Resp.)
+- TopClientsChart       : Top 5 clients du mois (Gérant, Resp., Commercial)
+- TopProduitsChart      : Top 5 produits par volume (Gérant, Resp.)
+- ImpayesWidget         : Total impayés + ancienneté (Gérant, Resp., Commercial)
+- AlerteStockWidget     : Alertes stock bas (Gérant, Resp., Gestionnaire)
+- StockOverviewWidget   : Valeur stock par emplacement (Gérant, Resp., Gestionnaire)
+- ProductionStatsWidget : Stats production du mois (Gérant, Resp., Agent prod.)
+- PerformanceCommerciauxTable : Perf. commerciaux (Gérant, Resp., Commercial)
+- TresorerieChart       : Encaissements vs décaissements 7 jours (Gérant, Resp.)
+
+### Trait WidgetVisibleParProfil ✅
+- Super_admin bypass le filtre par profil → voit tous les widgets
+- Évite dashboard vide si profil métier non assigné
+- Commit : bdf631d
+
+### Résultats en production ✅
+- CA du jour : 1 787 500 F — Marge brute : 1 306 124 F (73.1%)
+- Graphique CA 30 jours fonctionnel
+- Top clients : PROSUMA — Top produits : Poulet effilé / Gésiers / PAC
+- Stock valorisé : 1 059 028 FCFA — 4 produits — 0 alertes
+- Impayés : 787 500 F (vente PROSUMA partielle)
 
 ==============================================================
 
@@ -122,13 +169,13 @@
 | S4    | Module Production                 | ✅ Terminé    |
 | S5    | Module Stock                      | ✅ Terminé    |
 | S6    | CRM + Ventes + Reçu PDF           | ✅ Terminé    |
-| S7    | Caisse + Charges                  | 🔄 En cours   |
+| S7    | Caisse + Charges                  | ✅ Terminé    |
 | S8    | Eau + Viande                      | ⏳ À venir    |
-| S9    | Dashboards KPI                    | ⏳ À venir    |
+| S9    | Dashboards KPI                    | ✅ Terminé    |
 | S10   | Import/Export                     | ⏳ À venir    |
 | S11   | Recettage + Tests                 | ⏳ À venir    |
 | S12   | Déploiement final                 | ✅ Fait       |
 
 ==============================================================
-  Session en cours : S7 — Caisse + Charges
+  Prochaine étape : S8 — Modules complémentaires (Eau + Viande)
 ==============================================================
