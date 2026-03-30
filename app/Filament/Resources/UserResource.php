@@ -38,6 +38,12 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    // Cache le module du menu de navigation pour tous les non-super_admin
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('super_admin') ?? false;
+    }
+
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist->schema([

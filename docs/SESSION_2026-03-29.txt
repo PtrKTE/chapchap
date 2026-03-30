@@ -1,0 +1,416 @@
+================================================================================
+CHAPCHAP — RÉCAPITULATIF SESSION DU 2026-03-29
+================================================================================
+
+ENVIRONNEMENT
+─────────────
+- Projet    : /Applications/MAMP/htdocs/chapchap/
+- Serveur   : php artisan serve → http://localhost:8000/admin
+- DB locale : chapchap (données de prod réelles importées depuis XAMPP)
+- MySQL     : MAMP Pro (socket /Applications/MAMP/tmp/mysql/mysql.sock)
+- Laravel   : 12 / Filament 3 / PHP 8.4
+
+================================================================================
+1. REPRISE DU CONTEXTE — MIGRATION XAMPP → MAMP
+================================================================================
+
+- Le projet avait été développé sur XAMPP, puis migré vers MAMP Pro.
+- BDD exportée depuis XAMPP (MariaDB 10.4) et importée dans MySQL 8.0 MAMP.
+- Fichier handoff lu : SESSION_HANDOFF_2026-03-29.md
+- État au début de session : module Production partiellement modifié (quantite_unite
+  ajouté, migration appliquée, mais non testée).
+
+================================================================================
+2. TESTS PHPUNIT — CONFIGURATION BASE DE DONNÉES DE TEST
+================================================================================
+
+PROBLÈME :
+  Les tests CaisseServiceTest échouaient avec :
+  SQLSTATE[HY000] [1049] Unknown database 'chapchap_test'
+
+CAUSE :
+  phpunit.xml ne configurait pas le socket MySQL (MAMP fonctionne via socket,
+  pas via TCP).
+
+SOLUTION :
+  Modification de phpunit.xml pour ajouter :
+    <env name="DB_HOST" value="localhost"/>
+    <env name="DB_PORT" value="8889"/>
+    <env name="DB_USERNAME" value="root"/>
+    <env name="DB_PASSWORD" value="root"/>
+    <env name="DB_SOCKET" value="/Applications/MAMP/tmp/mysql/mysql.sock"/>
+
+  Création manuelle de la DB :
+    mysql -uroot -proot -S /Applications/MAMP/tmp/mysql/mysql.sock \
+      -e "CREATE DATABASE IF NOT EXISTS chapchap_test ..."
+
+FICHIER MODIFIÉ : phpunit.xml
+
+================================================================================
+3. RBAC / FILAMENT SHIELD — ÉTAT ACTUEL CONFIRMÉ
+================================================================================
+
+DISCUSSION :
+  L'utilisateur pensait que le RBAC n'était pas configuré.
+  Vérification avec : php artisan permission:show
+
+CONSTAT :
+  Le RBAC est déjà opérationnel avec 8 rôles configurés :
+    super_admin, gerant, resp_operations, gestionnaire_stock,
+    agent_production, commercial, point_de_vente, panel_user
+
+  Chaque rôle a ses permissions assignées (create/view/edit/delete par resource).
+  Filament Shield bloque automatiquement l'accès aux menus selon le rôle.
+
+AUCUNE MODIFICATION REQUISE.
+
+================================================================================
+4. DÉPLOIEMENT — DISCUSSION ET ORIENTATION
+================================================================================
+
+PROBLÈME IDENTIFIÉ :
+  Connexions SSH trop courtes, obligation de se reconnecter fréquemment.
+
+OPTIONS DISCUTÉES :
+  A) GitHub Actions → auto-deploy sur git push (git push = déploiement auto)
+  B) Laravel Forge → interface web avec bouton "Deploy Now"
+  C) FTP/SFTP → déconseillé pour Laravel
+
+DÉCISION :
+  GitHub Actions recommandé (Forge + Hestia = conflit potentiel car les deux
+  veulent gérer nginx/PHP/MySQL).
+  L'utilisateur souhaite garder SSH comme option secondaire.
+  → Implémentation reportée à une prochaine session.
+
+================================================================================
+5. MODULE PRODUCTION — CORRECTIONS ET AMÉLIORATIONS
+================================================================================
+
+5.1 FIX : ERREUR "quantite cannot be null"
+──────────────────────────────────────────
+CAUSE :
+  La colonne `quantite` (kg) était NOT NULL en base, mais le nouveau champ
+  `quantite_unite` permettait de laisser `quantite` vide.
+
+SOLUTION :
+  Nouvelle migration : make_quantite_nullable_in_production_lignes
+    → $table->decimal('quantite', 10, 3)->nullable()->change();
+
+  Validation formulaire ajoutée dans le Repeater :
+    Au moins un des deux champs (quantite_unite OU quantite) doit être rempli.
+
+FICHIERS MODIFIÉS :
+  - database/migrations/2026_03_29_215554_make_quantite_nullable_in_production_lignes.php
+  - app/Filament/Resources/ProductionResource.php (règle validation Repeater)
+
+────────────────────────────────────────────────────────────────────────────────
+
+5.2 NOUVELLE FONCTIONNALITÉ : PRÉ-REMPLISSAGE AUTOMATIQUE DES PRODUITS OBTENUS
+───────────────────────────────────────────────────────────────────────────────
+CONTEXTE MÉTIER (lexique validé par l'utilisateur) :
+
+  Définitions :
+    - Poulet effilé = poulet entier éviscéré (vendu entier)
+    - PAC (Poulet à la Cuisson) = poulet entier sans cou
+
+  Règles de calcul automatique :
+    nb_decoupe = nb_poulets_traites - nb_effil - nb_pac
+
+    Produit          | Quantité calculée
+    ─────────────────┼──────────────────────────────────
+    Gésiers          | nb_poulets_traites × 1
+    Foies            | nb_poulets_traites × 1
+    Intestins        | nb_poulets_traites × 1
+    Peaux            | nb_poulets_traites × 1
+    Poulet effilé    | nb_effil (saisi)
+    PAC              | nb_pac (saisi)
+    Cous             | nb_pac + nb_decoupe
+    Cuisses          | nb_decoupe × 2
+    Ailes            | nb_decoupe × 2
+    Escalopes        | nb_decoupe × 2
+    Carcasses        | nb_decoupe × 1
+    Pattes           | nb_decoupe × 2
+
+IMPLÉMENTATION :
+  Nouvelle section "Répartition des poulets" dans le formulaire :
+    - Champ "Dont poulets effilés" (nb_effil_form) → virtuel, non sauvegardé
+    - Champ "Dont PAC" (nb_pac_form) → virtuel, non sauvegardé
+    - Placeholder "Poulets à découper" → calculé en temps réel (live)
+
+  Bouton "Pré-remplir automatiquement" (Forms\Components\Actions) :
+    → Lit nb_poulets_traites, nb_effil_form, nb_pac_form
+    → Remplit le Repeater lignes avec toutes les lignes calculées
+    → Notification succès avec message de vérification
+
+FICHIER MODIFIÉ :
+  - app/Filament/Resources/ProductionResource.php
+
+────────────────────────────────────────────────────────────────────────────────
+
+5.3 AMÉLIORATION : CALCUL DU COÛT UNITAIRE PAR PRODUIT
+───────────────────────────────────────────────────────
+PROBLÈME INITIAL :
+  Le coût unitaire était identique pour tous les produits (répartition égale
+  par quantité). Ex : gésier = escalope = intestin → économiquement faux.
+
+ANCIENNE FORMULE :
+  cout_par_unite = cout_total_entrant / sum(toutes quantités)
+  → Même coût pour 1 gésier que pour 1 escalope.
+
+NOUVELLE FORMULE (répartition par valeur marchande) :
+  valorisation_ligne   = quantite_effective × prix_vente_defaut
+  total_valorisation   = sum(valorisation_ligne pour toutes les lignes)
+  cout_absorbe_ligne   = (valorisation_ligne / total_valorisation) × cout_total_entrant
+  cout_unitaire_ligne  = cout_absorbe_ligne / quantite_effective
+
+  Résultat : les escalopes (3 800 FCFA/kg) absorbent plus de coût que les
+  intestins (500 FCFA/kg). Cohérent avec la réalité économique.
+
+GESTION DE LA QUANTITÉ EFFECTIVE :
+  Depuis l'ajout de quantite_unite, certaines lignes n'ont pas de kg.
+  quantite_effective = quantite (kg) si > 0, sinon quantite_unite (pièces)
+
+FICHIERS MODIFIÉS :
+  - app/Filament/Resources/ProductionResource/Pages/EditProduction.php
+  - app/Filament/Resources/ProductionResource/Pages/ViewProduction.php
+
+────────────────────────────────────────────────────────────────────────────────
+
+5.4 CORRECTION : CALCUL DU RENDEMENT
+─────────────────────────────────────
+PROBLÈME INITIAL :
+  Le rendement affichait 687% → formule basée sur valorisation financière avec
+  des quantités en unités traitées comme si elles pesaient 1 kg chacune.
+
+EXPLICATION DU BUG :
+  963 gésiers × 2 500 FCFA/kg = 2 407 500 FCFA (calculé)
+  alors que la vraie valeur = 963 × 0,034 kg × 2 500 = 81 742 FCFA
+  → Gonflé 29× car on traitait chaque pièce comme 1 kg.
+
+DISCUSSION :
+  Deux types de rendement expliqués :
+    - Rendement poids   : poids_sortie / poids_entrée → standard industrie avicole
+    - Rendement financier : valorisation_vente / coût_achat → sensible aux unités
+
+DÉCISION : rendement poids (Option A avec saisie manuelle des kg).
+
+NOUVELLE FORMULE :
+  poids_obtenus = sum(quantite en kg des lignes où quantite > 0)
+  poids_entrant = poids_total_entrant (saisi dans le formulaire)
+  rendement     = poids_obtenus / poids_entrant
+
+  Si poids_entrant = 0 ou poids_obtenus = 0 → rendement = null (non calculable)
+  Exemple : 1 082 kg produits / 1 444,5 kg entrants = 74,9 %
+
+CONDITION POUR AVOIR LE RENDEMENT :
+  1. Renseigner "Poids moyen entrant" → poids total calculé automatiquement
+  2. Renseigner "Quantité (kg)" sur les lignes produits (pas uniquement les unités)
+
+FICHIERS MODIFIÉS :
+  - app/Filament/Resources/ProductionResource/Pages/EditProduction.php
+  - app/Filament/Resources/ProductionResource/Pages/ViewProduction.php
+
+================================================================================
+6. MODULE LOTS — AMÉLIORATIONS
+================================================================================
+
+6.1 NOUVELLE COLONNE : poids_total_lot
+───────────────────────────────────────
+MIGRATION CRÉÉE :
+  add_poids_total_to_lots_table
+  → $table->decimal('poids_total_lot', 10, 3)->nullable()->after('quantite_recue');
+
+MODÈLE MIS À JOUR :
+  app/Models/Lot.php
+  → Ajout dans $fillable + cast 'decimal:3'
+
+────────────────────────────────────────────────────────────────────────────────
+
+6.2 FORMULAIRE — SECTION QUANTITÉS
+────────────────────────────────────
+AJOUTS :
+  - Champ "Poids total du lot (kg)" → saisie manuelle, visible uniquement pour poulets
+  - Placeholder "Poids moyen par poulet" → calculé : poids_total_lot / quantite_recue
+    Exemple : 1 444,5 kg / 963 = 1,500 kg/poulet
+
+────────────────────────────────────────────────────────────────────────────────
+
+6.3 FORMULAIRE — SECTION COÛTS
+────────────────────────────────
+AJOUTS :
+  - "Coût qté utilisable" = quantite_utilisable × prix_unitaire
+    → Ce que le lot a réellement coûté en excluant les morts et refusés
+  - "Coût PM (morts × PU)" = quantite_morts × prix_unitaire
+    → Valeur des pertes à la réception (visible uniquement pour poulets)
+
+────────────────────────────────────────────────────────────────────────────────
+
+6.4 FORMULAIRE — SECTION FACTURATION
+──────────────────────────────────────
+AMÉLIORATION :
+  Le champ "Montant facture" se remplit maintenant AUTOMATIQUEMENT avec le
+  coût qté utilisable (quantite_utilisable × prix_unitaire) dès que les
+  quantités et le prix unitaire sont saisis.
+  → L'utilisateur peut ensuite modifier manuellement si nécessaire.
+
+LOGIQUE DANS calculerTotaux() :
+  coutUtilisable = quantite_utilisable × prix_unitaire
+  Si coutUtilisable > 0 → set('montant_facture', coutUtilisable)
+
+────────────────────────────────────────────────────────────────────────────────
+
+6.5 VUE DÉTAIL (INFOLIST) — RÉORGANISATION
+────────────────────────────────────────────
+AVANT : une seule section "Quantités & Coûts" avec 8 champs en 4 colonnes.
+
+APRÈS : deux sections séparées :
+  Section "Quantités" (3 colonnes) :
+    Qté reçue | Poids total lot | Poids moyen/poulet
+    Morts (PM) | Refusés (IR) | Utilisable
+
+  Section "Coûts" (3 colonnes) :
+    Prix unitaire | Transport | Coût total
+    CMP | Coût qté utilisable | Coût PM (pertes)
+
+FICHIER MODIFIÉ :
+  - app/Filament/Resources/LotResource.php
+
+================================================================================
+7. MODULE INVENTAIRE — AMÉLIORATIONS
+================================================================================
+
+7.1 BOUTON "CHARGER TOUS LES PRODUITS EN STOCK"
+─────────────────────────────────────────────────
+AVANT : l'utilisateur devait ajouter chaque produit manuellement un par un.
+
+APRÈS : un bouton "Charger tous les produits en stock" dans la section Comptage
+  → Lit l'emplacement sélectionné
+  → Interroge stock_emplacements (quantite > 0)
+  → Remplit le Repeater avec tous les produits + leur stock théorique actuel
+  → stock_physique laissé vide (l'utilisateur saisit le comptage réel)
+  → Notification : "X produits chargés"
+
+────────────────────────────────────────────────────────────────────────────────
+
+7.2 ÉCART COLORÉ DANS LE FORMULAIRE
+─────────────────────────────────────
+AVANT : écart affiché dans un TextInput disabled gris sans indication visuelle.
+
+APRÈS : Placeholder coloré avec HtmlString :
+  ✓ 0        → vert  (stock conforme)
+  ▲ +5,000   → bleu  (excédent physique)
+  ▼ -3,000   → rouge (manque physique)
+
+  Le champ `ecart` TextInput (->hidden()->dehydrated(true)) est conservé pour
+  la sauvegarde en base. Le Placeholder ecart_display est uniquement visuel.
+
+────────────────────────────────────────────────────────────────────────────────
+
+7.3 RÉSUMÉ DES AJUSTEMENTS (VUE DÉTAIL APRÈS VALIDATION)
+──────────────────────────────────────────────────────────
+Section "Résumé des ajustements" visible uniquement quand statut = VALIDE.
+Affiche 4 métriques calculées à la volée depuis les lignes + CMP :
+
+  Produits avec écart : nb_lignes_avec_ecart / nb_lignes_total
+  Valeur des pertes   : sum(abs(ecart négatif) × CMP) → rouge
+  Valeur des gains    : sum(ecart positif × CMP) → vert
+  Impact net          : (gains - pertes) en FCFA → couleur selon signe
+
+  Le CMP utilisé est le cout_moyen_pondere actuel de stock_emplacements.
+
+────────────────────────────────────────────────────────────────────────────────
+
+7.4 WORKFLOW INVENTAIRE (CONFIRMÉ ET GARDÉ)
+────────────────────────────────────────────
+  EN COURS → [Comptage terminé] → TERMINÉ → [Valider l'inventaire] → VALIDÉ
+
+  "Comptage terminé" = l'agent terrain a fini de compter, en attente de
+  validation par le gérant ou resp. opérations (séparation des responsabilités).
+
+FICHIER MODIFIÉ :
+  app/Filament/Resources/InventaireResource.php
+    → Import HtmlString
+    → Bouton "Charger tous les produits en stock" (Forms\Components\Actions)
+    → Repeater : écart hidden + ecart_display Placeholder coloré
+    → Infolist : section "Résumé des ajustements" avec 4 métriques
+
+================================================================================
+8. LISTE COMPLÈTE DES FICHIERS MODIFIÉS DANS CETTE SESSION
+================================================================================
+
+MIGRATIONS :
+  database/migrations/2026_03_29_215554_make_quantite_nullable_in_production_lignes.php
+  database/migrations/2026_03_29_234041_add_poids_total_to_lots_table.php
+
+MODÈLES :
+  app/Models/Lot.php
+    → poids_total_lot dans $fillable et casts
+
+RESOURCES FILAMENT :
+  app/Filament/Resources/ProductionResource.php
+    → Section "Répartition des poulets" (nb_effil_form, nb_pac_form, nb_decoupe_affiche)
+    → Bouton "Pré-remplir automatiquement" avec logique complète
+    → Helper text quantite → "Requis pour le calcul du rendement"
+
+  app/Filament/Resources/LotResource.php
+    → Section Quantités : poids_total_lot + poids_moyen_display
+    → Section Coûts : cout_qte_utilisable_display + cout_pm_display
+    → Section Facturation : auto-fill montant_facture
+    → Infolist réorganisée en 2 sections
+    → calculerTotaux() mise à jour avec auto-fill montant_facture
+
+  app/Filament/Resources/InventaireResource.php
+    → Bouton "Charger tous les produits en stock"
+    → Écart coloré (HtmlString Placeholder)
+    → Section "Résumé des ajustements" dans l'infolist
+
+PAGES PRODUCTION :
+  app/Filament/Resources/ProductionResource/Pages/EditProduction.php
+    → Coût unitaire par prorata valeur marchande
+    → quantite_effective (kg ou unités)
+    → Rendement poids (poids_obtenus / poids_entrant)
+
+  app/Filament/Resources/ProductionResource/Pages/ViewProduction.php
+    → Mêmes corrections que EditProduction
+    → Notification avec rendement texte ou "non calculable"
+
+CONFIGURATION :
+  phpunit.xml
+    → Ajout DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_SOCKET pour MAMP
+
+================================================================================
+9. POINTS D'ATTENTION TECHNIQUES
+================================================================================
+
+- MySQL MAMP fonctionne via socket uniquement (skip_networking=ON).
+  Toujours utiliser DB_SOCKET dans .env et phpunit.xml.
+
+- Filament Repeater avec ->relationship() : les champs virtuels (->dehydrated(false))
+  ne sont pas sauvegardés en base → nb_effil_form et nb_pac_form sont virtuels.
+
+- quantite_effective : dans la validation d'une production, on utilise quantite (kg)
+  si renseigné, sinon quantite_unite (pièces). Sans kg sur les lignes, le rendement
+  sera null.
+
+- montant_facture dans les lots est auto-rempli par calculerTotaux() mais reste
+  modifiable. Si l'utilisateur saisit manuellement une valeur différente, elle
+  est conservée.
+
+- Inventaire : le CMP utilisé pour le résumé des ajustements est le CMP actuel
+  de stock_emplacements au moment de la consultation (pas le CMP au moment de
+  la validation). Légère approximation acceptable.
+
+================================================================================
+10. PROCHAINES ÉTAPES IDENTIFIÉES
+================================================================================
+
+- [ ] Tester le module Inventaire complet (charger, compter, valider, résumé)
+- [ ] Tester le module Lot modifié (créer un nouveau lot complet)
+- [ ] Tester le rendement production avec kg saisis sur les lignes
+- [ ] Déploiement en production via GitHub Actions (à configurer)
+- [ ] Saisie vente rapide Livewire (mobile-first pour commerciaux terrain)
+- [ ] Corrections terrain suite aux retours d'utilisation réelle (S13-S14)
+
+================================================================================
+Fin du récapitulatif — Session 2026-03-29/30
+================================================================================

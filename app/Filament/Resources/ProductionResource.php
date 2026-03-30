@@ -64,10 +64,11 @@ class ProductionResource extends Resource
                         ->label('')
                         ->schema([
                             Infolists\Components\TextEntry::make('produit.nom')->label('Produit')->weight('bold'),
-                            Infolists\Components\TextEntry::make('quantite')->label('Quantité')->numeric(3),
+                            Infolists\Components\TextEntry::make('quantite_unite')->label('Qté (unités)')->numeric(0)->placeholder('—'),
+                            Infolists\Components\TextEntry::make('quantite')->label('Qté (kg)')->numeric(3)->suffix(' kg'),
                             Infolists\Components\TextEntry::make('cout_unitaire_calcule')->label('Coût unit.')->numeric(2)->suffix(' FCFA'),
                             Infolists\Components\TextEntry::make('valeur_totale')->label('Valeur')->numeric(0)->suffix(' FCFA')->color('primary'),
-                        ])->columns(4),
+                        ])->columns(5),
                 ]),
 
             Infolists\Components\Section::make('Validation')
@@ -185,10 +186,122 @@ class ProductionResource extends Resource
                         ->suffix('kg'),
                 ])->columns(2),
 
+            // Section 2b : Répartition pour le calcul automatique
+            Forms\Components\Section::make('Répartition des poulets')
+                ->description('Indiquez combien de poulets effilés et PAC vous produisez — le reste sera considéré comme découpe')
+                ->schema([
+                    Forms\Components\TextInput::make('nb_effil_form')
+                        ->label('Dont poulets effilés')
+                        ->numeric()
+                        ->integer()
+                        ->minValue(0)
+                        ->default(0)
+                        ->live(onBlur: true)
+                        // Champ virtuel : non sauvegardé en base (info déjà dans les lignes)
+                        ->dehydrated(false)
+                        ->helperText('Poulets vendus entiers (non découpés)'),
+                    Forms\Components\TextInput::make('nb_pac_form')
+                        ->label('Dont PAC (Poulet à la Cuisson)')
+                        ->numeric()
+                        ->integer()
+                        ->minValue(0)
+                        ->default(0)
+                        ->live(onBlur: true)
+                        ->dehydrated(false)
+                        ->helperText('Poulets entiers sans cou'),
+                    // Affichage calculé du nombre de poulets restants à découper
+                    Forms\Components\Placeholder::make('nb_decoupe_affiche')
+                        ->label('Poulets à découper (calculé)')
+                        ->content(function (Get $get): string {
+                            $total  = (int) ($get('nb_poulets_traites') ?? 0);
+                            $effil  = (int) ($get('nb_effil_form') ?? 0);
+                            $pac    = (int) ($get('nb_pac_form') ?? 0);
+                            $decoupe = max(0, $total - $effil - $pac);
+                            return $decoupe . ' poulets → ' . ($decoupe * 2) . ' cuisses, ' . ($decoupe * 2) . ' ailes, ' . ($decoupe * 2) . ' escalopes, ' . $decoupe . ' carcasses';
+                        })
+                        ->dehydrated(false),
+                ])->columns(3),
+
             // Section 3 : Lignes de production (Repeater)
             Forms\Components\Section::make('Produits obtenus')
                 ->description('Détail des produits issus de la découpe / abattage')
                 ->schema([
+                    // Bouton de pré-remplissage automatique basé sur la répartition saisie
+                    Forms\Components\Actions::make([
+                        Forms\Components\Actions\Action::make('preremplir')
+                            ->label('Pré-remplir automatiquement')
+                            ->icon('heroicon-o-sparkles')
+                            ->color('success')
+                            ->action(function (Get $get, Set $set) {
+                                $nbTotal  = (int) ($get('nb_poulets_traites') ?? 0);
+                                $nbEffil  = (int) ($get('nb_effil_form') ?? 0);
+                                $nbPac    = (int) ($get('nb_pac_form') ?? 0);
+                                $nbDecoupe = max(0, $nbTotal - $nbEffil - $nbPac);
+
+                                if ($nbTotal === 0) {
+                                    \Filament\Notifications\Notification::make()
+                                        ->warning()
+                                        ->title('Saisissez d\'abord le nombre de poulets traités.')
+                                        ->send();
+                                    return;
+                                }
+
+                                // Récupérer les IDs produits par code
+                                $produits = Produit::whereIn('code', [
+                                    'EFFIL', 'PAC', 'GESIER', 'FOIE', 'INTEST',
+                                    'PEAU', 'COUS', 'CUISS', 'AILES', 'ESCAL', 'CARC', 'PATTE',
+                                ])->pluck('id', 'code');
+
+                                $lignes = [];
+
+                                // Poulets effilés (vendus entiers)
+                                if ($nbEffil > 0 && isset($produits['EFFIL'])) {
+                                    $lignes[] = ['produit_id' => $produits['EFFIL'], 'quantite_unite' => $nbEffil, 'quantite' => null];
+                                }
+
+                                // PAC (poulets sans cou)
+                                if ($nbPac > 0 && isset($produits['PAC'])) {
+                                    $lignes[] = ['produit_id' => $produits['PAC'], 'quantite_unite' => $nbPac, 'quantite' => null];
+                                }
+
+                                // Abats systématiques : 1 par poulet traité
+                                foreach (['GESIER', 'FOIE', 'INTEST', 'PEAU'] as $code) {
+                                    if (isset($produits[$code])) {
+                                        $lignes[] = ['produit_id' => $produits[$code], 'quantite_unite' => $nbTotal, 'quantite' => null];
+                                    }
+                                }
+
+                                // Cous : PAC perd son cou + chaque poulet découpé donne 1 cou
+                                $nbCous = $nbPac + $nbDecoupe;
+                                if ($nbCous > 0 && isset($produits['COUS'])) {
+                                    $lignes[] = ['produit_id' => $produits['COUS'], 'quantite_unite' => $nbCous, 'quantite' => null];
+                                }
+
+                                // Produits de découpe (uniquement pour les poulets non effilés et non PAC)
+                                if ($nbDecoupe > 0) {
+                                    $produitsDecoupe = [
+                                        'CUISS' => $nbDecoupe * 2, // 2 cuisses par poulet
+                                        'AILES' => $nbDecoupe * 2, // 2 ailes par poulet
+                                        'ESCAL' => $nbDecoupe * 2, // 2 escalopes par poulet
+                                        'CARC'  => $nbDecoupe,     // 1 carcasse par poulet
+                                        'PATTE' => $nbDecoupe * 2, // 2 pattes par poulet
+                                    ];
+                                    foreach ($produitsDecoupe as $code => $qte) {
+                                        if (isset($produits[$code])) {
+                                            $lignes[] = ['produit_id' => $produits[$code], 'quantite_unite' => $qte, 'quantite' => null];
+                                        }
+                                    }
+                                }
+
+                                $set('lignes', $lignes);
+
+                                \Filament\Notifications\Notification::make()
+                                    ->success()
+                                    ->title('Produits pré-remplis ! Vérifiez et ajustez les quantités en kg si nécessaire.')
+                                    ->send();
+                            }),
+                    ]),
+
                     Forms\Components\Repeater::make('lignes')
                         ->label('')
                         ->relationship()
@@ -202,14 +315,31 @@ class ProductionResource extends Resource
                                 )
                                 ->required()
                                 ->searchable(),
-                            Forms\Components\TextInput::make('quantite')
-                                ->label('Quantité (kg ou unités)')
+                            Forms\Components\TextInput::make('quantite_unite')
+                                ->label('Quantité (unités)')
                                 ->numeric()
-                                ->required()
-                                ->minValue(0.001)
-                                ->step(0.001),
+                                ->integer()
+                                ->minValue(0)
+                                ->placeholder('ex: 100')
+                                ->helperText('Nombre de pièces')
+                                // Au moins un des deux champs doit être rempli
+                                ->rules([
+                                    fn(\Filament\Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                        if (blank($value) && blank($get('quantite'))) {
+                                            $fail('Renseignez au moins la quantité en unités ou en kg.');
+                                        }
+                                    },
+                                ]),
+                            Forms\Components\TextInput::make('quantite')
+                                ->label('Quantité (kg)')
+                                ->numeric()
+                                ->minValue(0)
+                                ->step(0.001)
+                                ->suffix('kg')
+                                ->placeholder('ex: 45.500')
+                                ->helperText('Requis pour le calcul du rendement'),
                         ])
-                        ->columns(2)
+                        ->columns(3)
                         ->defaultItems(0)
                         ->addActionLabel('Ajouter un produit')
                         ->reorderable(false)
@@ -306,6 +436,13 @@ class ProductionResource extends Resource
             'create' => Pages\CreateProduction::route('/create'),
             'view'   => Pages\ViewProduction::route('/{record}'),
             'edit'   => Pages\EditProduction::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            ProductionResource\Widgets\ProductionStatsWidget::class,
         ];
     }
 }

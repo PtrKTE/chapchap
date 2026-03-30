@@ -88,42 +88,78 @@ class ViewProduction extends ViewRecord
             return;
         }
 
-        $stockService            = app(StockService::class);
-        $coutTotalEntrant        = $production->nb_poulets_traites * (float) $lot->cout_moyen_unitaire;
-        $totalQuantiteLignes     = (float) $lignes->sum('quantite');
-        $totalValorisationSortie = 0;
+        $stockService     = app(StockService::class);
+        $coutTotalEntrant = $production->nb_poulets_traites * (float) $lot->cout_moyen_unitaire;
 
-        // Coût unitaire par kg : réparti équitablement sur le poids total produit
-        $coutParKg = $totalQuantiteLignes > 0 ? $coutTotalEntrant / $totalQuantiteLignes : 0;
+        // Quantité effective : quantite (kg) si renseignée, sinon quantite_unite (pièces)
+        $quantiteEffective = fn($ligne): float => (float) $ligne->quantite > 0
+            ? (float) $ligne->quantite
+            : (float) ($ligne->quantite_unite ?? 0);
+
+        // ─── Répartition du coût au PRORATA DE LA VALEUR MARCHANDE ───────────────
+        // Chaque produit absorbe une part du coût proportionnelle à ce qu'il vaut à la vente.
+        // Ex : une escalope (3 800 FCFA/kg) absorbe plus de coût qu'un intestin (500 FCFA/kg).
+        // ─────────────────────────────────────────────────────────────────────────
+
+        // Étape 1 : valorisation théorique de chaque ligne (qté × prix vente)
+        $valorisationsParLigne = $lignes->mapWithKeys(function ($ligne) use ($quantiteEffective) {
+            $qte  = $quantiteEffective($ligne);
+            $prix = (float) ($ligne->produit->prix_vente_defaut ?? 0);
+            return [$ligne->id => $qte * $prix];
+        });
+
+        $totalValorisation = (float) $valorisationsParLigne->sum();
+
+        // Fallback : répartition par quantité égale si aucun prix défini
+        $totalQuantite = $totalValorisation === 0.0
+            ? (float) $lignes->sum(fn($l) => $quantiteEffective($l))
+            : 0.0;
+
+        $totalValorisationSortie = $totalValorisation;
 
         foreach ($lignes as $ligne) {
-            $valeurLigne = round((float) $ligne->quantite * $coutParKg, 2);
+            $qteEff = $quantiteEffective($ligne);
+
+            // Étape 2 : coût unitaire proportionnel à la valeur marchande du produit
+            if ($totalValorisation > 0) {
+                $coutAbsorbe       = ($valorisationsParLigne[$ligne->id] / $totalValorisation) * $coutTotalEntrant;
+                $coutUnitaireLigne = $qteEff > 0 ? $coutAbsorbe / $qteEff : 0;
+            } else {
+                $coutUnitaireLigne = $totalQuantite > 0 ? $coutTotalEntrant / $totalQuantite : 0;
+            }
 
             $ligne->update([
-                'cout_unitaire_calcule' => round($coutParKg, 4),
-                'valeur_totale'         => $valeurLigne,
+                'cout_unitaire_calcule' => round($coutUnitaireLigne, 4),
+                'valeur_totale'         => round($qteEff * $coutUnitaireLigne, 2),
             ]);
 
-            $stockService->entree(
-                produitId:     $ligne->produit_id,
-                emplacementId: $emplacement->id,
-                quantite:      (float) $ligne->quantite,
-                coutUnitaire:  $coutParKg,
-                typeMouvement: TypeMouvement::ENTREE_PRODUCTION,
-                lotId:         $lot->id,
-                productionId:  $production->id,
-                motif:         "Production {$production->reference} — Lot {$lot->reference}",
-            );
-
-            $totalValorisationSortie += (float) $ligne->quantite * (float) ($ligne->produit->prix_vente_defaut ?? 0);
+            if ($qteEff > 0) {
+                $stockService->entree(
+                    produitId:     $ligne->produit_id,
+                    emplacementId: $emplacement->id,
+                    quantite:      $qteEff,
+                    coutUnitaire:  $coutUnitaireLigne,
+                    typeMouvement: TypeMouvement::ENTREE_PRODUCTION,
+                    lotId:         $lot->id,
+                    productionId:  $production->id,
+                    motif:         "Production {$production->reference} — Lot {$lot->reference}",
+                );
+            }
         }
 
-        // Rendement = valorisation vente / coût matière
-        $rendement = $coutTotalEntrant > 0 ? $totalValorisationSortie / $coutTotalEntrant : 0;
+        // Rendement POIDS = poids total des produits obtenus (kg) / poids total entrant (kg)
+        // C'est la métrique standard en abattage avicole.
+        // Ex : 75% = 75% du poids des poulets vivants est récupéré en produits utilisables.
+        // On ne prend que les lignes avec une quantité en kg (quantite > 0).
+        $poidsObtenus = (float) $lignes->sum('quantite');
+        $poidsEntrant = (float) ($production->poids_total_entrant ?? 0);
+        $rendement    = ($poidsEntrant > 0 && $poidsObtenus > 0)
+            ? round($poidsObtenus / $poidsEntrant, 4)
+            : null;
 
         $production->update([
             'statut'          => StatutProduction::VALIDEE->value,
-            'rendement'       => round($rendement, 4),
+            'rendement'       => $rendement,
             'valide_par'      => auth()->id(),
             'date_validation' => now(),
         ]);
@@ -135,9 +171,13 @@ class ViewProduction extends ViewRecord
             $lot->update(['date_production' => $production->date_production]);
         }
 
+        $rendementTexte = $rendement !== null
+            ? number_format($rendement * 100, 1) . ' %'
+            : 'non calculable (poids entrant non renseigné)';
+
         Notification::make()
             ->title('Production validée !')
-            ->body("Stock mis à jour pour {$lignes->count()} produits. Rendement : " . number_format($rendement * 100, 1) . ' %')
+            ->body("Stock mis à jour pour {$lignes->count()} produits. Rendement poids : {$rendementTexte}")
             ->success()->send();
 
         $this->refreshFormData(['statut']);

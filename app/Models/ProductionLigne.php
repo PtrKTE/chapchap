@@ -14,6 +14,7 @@ class ProductionLigne extends Model
     protected $fillable = [
         'production_id',
         'produit_id',
+        'quantite_unite',
         'quantite',
         'cout_unitaire_calcule',
         'valeur_totale',
@@ -22,9 +23,10 @@ class ProductionLigne extends Model
     protected function casts(): array
     {
         return [
-            'quantite' => 'decimal:3',
+            'quantite_unite'        => 'integer',
+            'quantite'              => 'decimal:3',
             'cout_unitaire_calcule' => 'decimal:4',
-            'valeur_totale' => 'decimal:2',
+            'valeur_totale'         => 'decimal:2',
         ];
     }
 

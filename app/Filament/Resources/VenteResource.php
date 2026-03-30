@@ -616,4 +616,11 @@ class VenteResource extends Resource
             'edit'   => Pages\EditVente::route('/{record}/edit'),
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            VenteResource\Widgets\VenteStatsWidget::class,
+        ];
+    }
 }

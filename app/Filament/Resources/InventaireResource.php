@@ -19,6 +19,7 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 
 /**
  * Resource Filament pour les inventaires physiques.
@@ -63,6 +64,66 @@ class InventaireResource extends Resource
                             Infolists\Components\TextEntry::make('justification')->label('Justification')->placeholder('—'),
                         ])->columns(5),
                 ]),
+
+            // Résumé des ajustements — visible uniquement après validation
+            Infolists\Components\Section::make('Résumé des ajustements')
+                ->icon('heroicon-o-chart-bar')
+                ->visible(fn(Inventaire $record): bool => $record->statut === StatutInventaire::VALIDE)
+                ->schema([
+                    Infolists\Components\TextEntry::make('nb_avec_ecart')
+                        ->label('Produits avec écart')
+                        ->getStateUsing(fn(Inventaire $record): string =>
+                            $record->lignes->filter(fn($l) => abs((float) $l->ecart) > 0.001)->count()
+                            . ' / ' . $record->lignes->count()
+                        ),
+                    Infolists\Components\TextEntry::make('valeur_pertes')
+                        ->label('Valeur des pertes (−)')
+                        ->getStateUsing(function (Inventaire $record): string {
+                            $total = 0;
+                            foreach ($record->lignes as $ligne) {
+                                $ecart = (float) $ligne->ecart;
+                                if ($ecart >= 0) continue;
+                                $cmp = (float) StockEmplacement::where('produit_id', $ligne->produit_id)
+                                    ->where('emplacement_id', $record->emplacement_id)
+                                    ->value('cout_moyen_pondere');
+                                $total += abs($ecart) * $cmp;
+                            }
+                            return number_format($total, 0, ',', ' ') . ' FCFA';
+                        })
+                        ->color('danger'),
+                    Infolists\Components\TextEntry::make('valeur_gains')
+                        ->label('Valeur des gains (+)')
+                        ->getStateUsing(function (Inventaire $record): string {
+                            $total = 0;
+                            foreach ($record->lignes as $ligne) {
+                                $ecart = (float) $ligne->ecart;
+                                if ($ecart <= 0) continue;
+                                $cmp = (float) StockEmplacement::where('produit_id', $ligne->produit_id)
+                                    ->where('emplacement_id', $record->emplacement_id)
+                                    ->value('cout_moyen_pondere');
+                                $total += $ecart * $cmp;
+                            }
+                            return number_format($total, 0, ',', ' ') . ' FCFA';
+                        })
+                        ->color('success'),
+                    Infolists\Components\TextEntry::make('impact_net')
+                        ->label('Impact net sur le stock')
+                        ->getStateUsing(function (Inventaire $record): string {
+                            $net = 0;
+                            foreach ($record->lignes as $ligne) {
+                                $ecart = (float) $ligne->ecart;
+                                if (abs($ecart) < 0.001) continue;
+                                $cmp = (float) StockEmplacement::where('produit_id', $ligne->produit_id)
+                                    ->where('emplacement_id', $record->emplacement_id)
+                                    ->value('cout_moyen_pondere');
+                                $net += $ecart * $cmp;
+                            }
+                            $signe = $net >= 0 ? '+' : '';
+                            return $signe . number_format($net, 0, ',', ' ') . ' FCFA';
+                        })
+                        ->color(fn(Inventaire $record): string => $record->lignes->sum('ecart') >= 0 ? 'success' : 'danger')
+                        ->weight('bold'),
+                ])->columns(4),
 
             Infolists\Components\Section::make('Validation')
                 ->schema([
@@ -112,22 +173,69 @@ class InventaireResource extends Resource
 
             // Section 2 : Lignes d'inventaire
             Forms\Components\Section::make('Comptage des produits')
-                ->description('Saisissez la quantité physique comptée pour chaque produit. Le stock théorique est rempli automatiquement.')
+                ->description('Cliquez sur "Charger tous les produits" pour pré-remplir le stock théorique, puis saisissez les quantités physiques comptées.')
                 ->schema([
+                    // Bouton pour charger automatiquement tous les produits en stock
+                    Forms\Components\Actions::make([
+                        Forms\Components\Actions\Action::make('charger_produits')
+                            ->label('Charger tous les produits en stock')
+                            ->icon('heroicon-o-arrow-down-tray')
+                            ->color('info')
+                            ->action(function (Get $get, Set $set) {
+                                $emplacementId = $get('emplacement_id');
+
+                                if (! $emplacementId) {
+                                    \Filament\Notifications\Notification::make()
+                                        ->warning()
+                                        ->title('Sélectionnez d\'abord un emplacement.')
+                                        ->send();
+                                    return;
+                                }
+
+                                // Récupérer tous les produits avec stock > 0 pour cet emplacement
+                                $stocks = StockEmplacement::where('emplacement_id', $emplacementId)
+                                    ->where('quantite', '>', 0)
+                                    ->with('produit')
+                                    ->get();
+
+                                if ($stocks->isEmpty()) {
+                                    \Filament\Notifications\Notification::make()
+                                        ->warning()
+                                        ->title('Aucun produit en stock pour cet emplacement.')
+                                        ->send();
+                                    return;
+                                }
+
+                                // Remplir le Repeater : stock théorique = stock système, physique vide
+                                $lignes = $stocks->map(fn($stock) => [
+                                    'produit_id'      => $stock->produit_id,
+                                    'stock_theorique' => (float) $stock->quantite,
+                                    'stock_physique'  => null,
+                                    'ecart'           => 0,
+                                    'justification'   => null,
+                                ])->values()->toArray();
+
+                                $set('lignes', $lignes);
+
+                                \Filament\Notifications\Notification::make()
+                                    ->success()
+                                    ->title("{$stocks->count()} produits chargés. Saisissez les quantités comptées.")
+                                    ->send();
+                            }),
+                    ]),
+
                     Forms\Components\Repeater::make('lignes')
                         ->label('')
                         ->relationship()
                         ->schema([
                             Forms\Components\Select::make('produit_id')
                                 ->label('Produit')
-                                ->options(
-                                    Produit::where('actif', true)->pluck('nom', 'id')
-                                )
+                                ->options(Produit::where('actif', true)->pluck('nom', 'id'))
                                 ->required()
                                 ->searchable()
                                 ->live()
                                 ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
-                                    // Auto-remplir le stock théorique quand on sélectionne un produit
+                                    // Auto-remplir le stock théorique quand on sélectionne un produit manuellement
                                     if ($state) {
                                         $emplacementId = $get('../../emplacement_id');
                                         if ($emplacementId) {
@@ -139,7 +247,7 @@ class InventaireResource extends Resource
                                     }
                                 }),
 
-                            // Stock théorique = ce que dit le système
+                            // Stock théorique = ce que dit le système (non modifiable)
                             Forms\Components\TextInput::make('stock_theorique')
                                 ->label('Stock théorique')
                                 ->numeric()
@@ -148,38 +256,57 @@ class InventaireResource extends Resource
                                 ->dehydrated(true)
                                 ->helperText('Quantité système'),
 
-                            // Stock physique = ce qu'on a compté
+                            // Stock physique = ce qu'on a compté réellement
                             Forms\Components\TextInput::make('stock_physique')
-                                ->label('Stock physique')
+                                ->label('Stock physique compté')
                                 ->numeric()
                                 ->required()
                                 ->step(0.001)
                                 ->live(onBlur: true)
                                 ->afterStateUpdated(function (Get $get, Set $set) {
-                                    // Calcul automatique de l'écart
                                     $theorique = (float) ($get('stock_theorique') ?? 0);
-                                    $physique = (float) ($get('stock_physique') ?? 0);
+                                    $physique  = (float) ($get('stock_physique') ?? 0);
                                     $set('ecart', round($physique - $theorique, 3));
                                 })
-                                ->helperText('Quantité comptée'),
+                                ->helperText('Quantité comptée sur le terrain'),
 
-                            // Écart = physique - théorique (calculé auto)
+                            // Champ ecart caché — sauvegardé en base
                             Forms\Components\TextInput::make('ecart')
                                 ->label('Écart')
                                 ->numeric()
-                                ->disabled()
-                                ->dehydrated(true)
-                                ->helperText('Physique - Théorique'),
+                                ->hidden()
+                                ->dehydrated(true),
+
+                            // Affichage coloré de l'écart (physique - théorique)
+                            Forms\Components\Placeholder::make('ecart_display')
+                                ->label('Écart')
+                                ->content(function (Get $get): HtmlString {
+                                    $ecart = (float) ($get('ecart') ?? 0);
+                                    if (abs($ecart) < 0.001) {
+                                        return new HtmlString(
+                                            '<span style="color:#16a34a;font-weight:bold;">✓ 0</span>'
+                                        );
+                                    }
+                                    if ($ecart > 0) {
+                                        return new HtmlString(
+                                            '<span style="color:#2563eb;font-weight:bold;">▲ +' . number_format($ecart, 3, ',', ' ') . '</span>'
+                                        );
+                                    }
+                                    return new HtmlString(
+                                        '<span style="color:#dc2626;font-weight:bold;">▼ ' . number_format($ecart, 3, ',', ' ') . '</span>'
+                                    );
+                                })
+                                ->dehydrated(false),
 
                             // Justification obligatoire si écart
                             Forms\Components\TextInput::make('justification')
                                 ->label('Justification')
-                                ->helperText('Obligatoire si écart')
+                                ->helperText('Obligatoire si écart ≠ 0')
                                 ->columnSpanFull(),
                         ])
-                        ->columns(4)
+                        ->columns(5)
                         ->defaultItems(0)
-                        ->addActionLabel('Ajouter un produit')
+                        ->addActionLabel('Ajouter un produit manuellement')
                         ->reorderable(false)
                         ->collapsible()
                         ->itemLabel(fn(array $state): ?string => $state['produit_id']

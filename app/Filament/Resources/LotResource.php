@@ -47,18 +47,42 @@ class LotResource extends Resource
                         ->color(fn(string $state) => match ($state) { 'poulet' => 'warning', 'oeuf' => 'info', default => 'gray' }),
                 ])->columns(4),
 
-            Infolists\Components\Section::make('Quantités & Coûts')
+            Infolists\Components\Section::make('Quantités')
                 ->icon('heroicon-o-calculator')
                 ->schema([
                     Infolists\Components\TextEntry::make('quantite_recue')->label('Qté reçue')->numeric(0),
+                    Infolists\Components\TextEntry::make('poids_total_lot')->label('Poids total lot')->numeric(3)->suffix(' kg')->placeholder('—'),
+                    Infolists\Components\TextEntry::make('poids_total_lot')
+                        ->label('Poids moyen / poulet')
+                        ->formatStateUsing(function ($state, $record): string {
+                            $recue = (int) ($record->quantite_recue ?? 0);
+                            $poids = (float) ($state ?? 0);
+                            if ($poids <= 0 || $recue <= 0) return '—';
+                            return number_format($poids / $recue, 3, ',', ' ') . ' kg';
+                        }),
                     Infolists\Components\TextEntry::make('quantite_morts')->label('Morts (PM)')->numeric(0)->color('danger'),
                     Infolists\Components\TextEntry::make('quantite_refuses')->label('Refusés (IR)')->numeric(0)->color('warning'),
                     Infolists\Components\TextEntry::make('quantite_utilisable')->label('Utilisable')->numeric(0)->weight('bold')->color('success'),
+                ])->columns(3),
+
+            Infolists\Components\Section::make('Coûts')
+                ->icon('heroicon-o-banknotes')
+                ->schema([
                     Infolists\Components\TextEntry::make('prix_unitaire')->label('Prix unitaire')->numeric(0)->suffix(' FCFA'),
                     Infolists\Components\TextEntry::make('cout_transport')->label('Transport')->numeric(0)->suffix(' FCFA'),
                     Infolists\Components\TextEntry::make('cout_total')->label('Coût total')->numeric(0)->suffix(' FCFA')->weight('bold'),
                     Infolists\Components\TextEntry::make('cout_moyen_unitaire')->label('CMP')->numeric(2)->suffix(' FCFA')->color('primary'),
-                ])->columns(4),
+                    Infolists\Components\TextEntry::make('quantite_utilisable')
+                        ->label('Coût qté utilisable')
+                        ->formatStateUsing(fn($state, $record): string =>
+                            number_format((int) $state * (float) $record->prix_unitaire, 0, ',', ' ') . ' FCFA'
+                        )->color('success'),
+                    Infolists\Components\TextEntry::make('quantite_morts')
+                        ->label('Coût PM (pertes)')
+                        ->formatStateUsing(fn($state, $record): string =>
+                            number_format((int) $state * (float) $record->prix_unitaire, 0, ',', ' ') . ' FCFA'
+                        )->color('danger'),
+                ])->columns(3),
 
             Infolists\Components\Section::make('Facturation')
                 ->icon('heroicon-o-document-text')
@@ -140,6 +164,27 @@ class LotResource extends Resource
                         ->minValue(1)
                         ->live(onBlur: true)
                         ->afterStateUpdated(fn(Get $get, Set $set) => static::calculerTotaux($get, $set)),
+                    Forms\Components\TextInput::make('poids_total_lot')
+                        ->label('Poids total du lot (kg)')
+                        ->numeric()
+                        ->step(0.001)
+                        ->minValue(0)
+                        ->suffix('kg')
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn(Get $get, Set $set) => static::calculerTotaux($get, $set))
+                        ->helperText('Poids total pesé à la réception')
+                        ->visible(fn(Get $get): bool => $get('type_produit') === 'poulet'),
+                    Forms\Components\Placeholder::make('poids_moyen_display')
+                        ->label('Poids moyen par poulet')
+                        ->content(function (Get $get): string {
+                            $poids = (float) ($get('poids_total_lot') ?? 0);
+                            $recue = (int) ($get('quantite_recue') ?? 0);
+                            if ($poids <= 0 || $recue <= 0) {
+                                return '—';
+                            }
+                            return number_format($poids / $recue, 3, ',', ' ') . ' kg/poulet';
+                        })
+                        ->visible(fn(Get $get): bool => $get('type_produit') === 'poulet'),
                     Forms\Components\TextInput::make('quantite_morts')
                         ->label('Poulets morts (PM)')
                         ->numeric()
@@ -208,21 +253,33 @@ class LotResource extends Resource
                     Forms\Components\Placeholder::make('cout_total_display')
                         ->label('Coût total')
                         ->content(function (Get $get): string {
-                            $coutTotal = static::calculerCoutTotal($get);
-
-                            return number_format($coutTotal, 0, ',', ' ') . ' FCFA';
+                            return number_format(static::calculerCoutTotal($get), 0, ',', ' ') . ' FCFA';
                         }),
                     Forms\Components\Placeholder::make('cout_moyen_display')
                         ->label('Coût moyen unitaire')
                         ->content(function (Get $get): string {
-                            $coutTotal = static::calculerCoutTotal($get);
+                            $coutTotal  = static::calculerCoutTotal($get);
                             $utilisable = static::calculerQuantiteUtilisable($get);
                             if ($utilisable <= 0) {
                                 return '—';
                             }
-
                             return number_format($coutTotal / $utilisable, 2, ',', ' ') . ' FCFA';
                         }),
+                    Forms\Components\Placeholder::make('cout_qte_utilisable_display')
+                        ->label('Coût qté utilisable')
+                        ->content(function (Get $get): string {
+                            $utilisable = static::calculerQuantiteUtilisable($get);
+                            $pu = (float) ($get('prix_unitaire') ?? 0);
+                            return number_format($utilisable * $pu, 0, ',', ' ') . ' FCFA';
+                        }),
+                    Forms\Components\Placeholder::make('cout_pm_display')
+                        ->label('Coût PM (morts × PU)')
+                        ->content(function (Get $get): string {
+                            $morts = (int) ($get('quantite_morts') ?? 0);
+                            $pu    = (float) ($get('prix_unitaire') ?? 0);
+                            return number_format($morts * $pu, 0, ',', ' ') . ' FCFA';
+                        })
+                        ->visible(fn(Get $get): bool => $get('type_produit') === 'poulet'),
                 ])->columns(2),
 
             // Section 4 : Facturation
@@ -234,7 +291,8 @@ class LotResource extends Resource
                         ->default(0)
                         ->suffix('FCFA')
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn(Get $get, Set $set) => static::calculerStatutFacture($get, $set)),
+                        ->afterStateUpdated(fn(Get $get, Set $set) => static::calculerStatutFacture($get, $set))
+                        ->helperText('Pré-rempli avec le coût qté utilisable — modifiable manuellement'),
                     Forms\Components\TextInput::make('montant_regle')
                         ->label('Montant réglé (FCFA)')
                         ->numeric()
@@ -448,6 +506,13 @@ class LotResource extends Resource
         ];
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            LotResource\Widgets\LotStatsWidget::class,
+        ];
+    }
+
     // --- Méthodes de calcul ---
 
     protected static function calculerQuantiteUtilisable(Get $get): int
@@ -480,6 +545,15 @@ class LotResource extends Resource
 
         $cmp = $utilisable > 0 ? $coutTotal / $utilisable : 0;
         $set('cout_moyen_unitaire', round($cmp, 4));
+
+        // Auto-remplir montant_facture avec le coût de la qté utilisable
+        // (qté utilisable × prix unitaire) — l'utilisateur peut modifier ensuite
+        $pu = (float) ($get('prix_unitaire') ?? 0);
+        $coutUtilisable = $utilisable * $pu;
+        if ($coutUtilisable > 0) {
+            $set('montant_facture', round($coutUtilisable, 2));
+            static::calculerStatutFacture($get, $set);
+        }
     }
 
     protected static function calculerStatutFacture(Get $get, Set $set): void

@@ -286,4 +286,11 @@ class ChargeResource extends Resource
             'edit' => Pages\EditCharge::route('/{record}/edit'),
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            ChargeResource\Widgets\ChargeStatsWidget::class,
+        ];
+    }
 }

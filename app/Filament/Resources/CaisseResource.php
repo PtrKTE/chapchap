@@ -336,6 +336,13 @@ class CaisseResource extends Resource
         ];
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            CaisseResource\Widgets\CaisseStatsWidget::class,
+        ];
+    }
+
     /**
      * Recalcule le solde et l'écart à chaque modification des champs.
      */

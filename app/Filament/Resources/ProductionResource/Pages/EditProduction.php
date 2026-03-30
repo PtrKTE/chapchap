@@ -111,50 +111,84 @@ class EditProduction extends EditRecord
 
         // Coût total des poulets utilisés pour cette production
         $coutTotalEntrant = $production->nb_poulets_traites * (float) $lot->cout_moyen_unitaire;
-        $totalValorisationSortie = 0;
+
+        // Quantité effective : quantite (kg) si renseignée, sinon quantite_unite (pièces)
+        $quantiteEffective = fn($ligne): float => (float) $ligne->quantite > 0
+            ? (float) $ligne->quantite
+            : (float) ($ligne->quantite_unite ?? 0);
+
+        // ─── Répartition du coût au PRORATA DE LA VALEUR MARCHANDE ───────────────
+        // Chaque produit absorbe une part du coût proportionnelle à ce qu'il vaut à la vente.
+        // Ex : une escalope (3 800 FCFA/kg) absorbe plus de coût qu'un intestin (500 FCFA/kg).
+        // Formule : coût_unitaire_ligne = (valorisation_ligne / total_valorisation) × coût_total / quantité
+        // ─────────────────────────────────────────────────────────────────────────
+
+        // Étape 1 : calculer la valorisation théorique de chaque ligne (qté × prix vente)
+        $valorisationsParLigne = $lignes->mapWithKeys(function ($ligne) use ($quantiteEffective) {
+            $qte  = $quantiteEffective($ligne);
+            $prix = (float) ($ligne->produit->prix_vente_defaut ?? 0);
+            return [$ligne->id => $qte * $prix];
+        });
+
+        $totalValorisation = (float) $valorisationsParLigne->sum();
+
+        // Fallback : si aucun prix de vente n'est défini, on répartit par quantité égale
+        $totalQuantite = $totalValorisation === 0.0
+            ? (float) $lignes->sum(fn($l) => $quantiteEffective($l))
+            : 0.0;
+
+        $totalValorisationSortie = $totalValorisation;
 
         // Pour chaque ligne de production : créer l'entrée stock
         foreach ($lignes as $ligne) {
-            // Le coût unitaire de chaque produit est proportionnel au poids
-            // On répartit le coût total au prorata des quantités
-            $totalQuantiteLignes = $lignes->sum('quantite');
-            $coutUnitaireLigne = $totalQuantiteLignes > 0
-                ? ($coutTotalEntrant * (float) $ligne->quantite) / $totalQuantiteLignes / (float) $ligne->quantite
-                : 0;
+            $qteEff = $quantiteEffective($ligne);
+
+            // Étape 2 : part du coût total absorbée par cette ligne
+            if ($totalValorisation > 0) {
+                // Répartition par valeur marchande (méthode recommandée)
+                $coutAbsorbe      = ($valorisationsParLigne[$ligne->id] / $totalValorisation) * $coutTotalEntrant;
+                $coutUnitaireLigne = $qteEff > 0 ? $coutAbsorbe / $qteEff : 0;
+            } else {
+                // Fallback : répartition égale par quantité
+                $coutUnitaireLigne = $totalQuantite > 0 ? $coutTotalEntrant / $totalQuantite : 0;
+            }
 
             // Mettre à jour la ligne avec le coût calculé
             $ligne->update([
                 'cout_unitaire_calcule' => round($coutUnitaireLigne, 4),
-                'valeur_totale' => round((float) $ligne->quantite * $coutUnitaireLigne, 2),
+                'valeur_totale'         => round($qteEff * $coutUnitaireLigne, 2),
             ]);
 
-            // Entrée en stock
-            $stockService->entree(
-                produitId: $ligne->produit_id,
-                emplacementId: $emplacement->id,
-                quantite: (float) $ligne->quantite,
-                coutUnitaire: $coutUnitaireLigne,
-                typeMouvement: TypeMouvement::ENTREE_PRODUCTION,
-                lotId: $lot->id,
-                productionId: $production->id,
-                motif: "Production {$production->reference} — Lot {$lot->reference}",
-            );
-
-            // Valorisation pour le calcul du rendement
-            $prixVente = $ligne->produit->prix_vente_defaut ?? 0;
-            $totalValorisationSortie += (float) $ligne->quantite * (float) $prixVente;
+            // Entrée en stock avec la quantité effective
+            if ($qteEff > 0) {
+                $stockService->entree(
+                    produitId:     $ligne->produit_id,
+                    emplacementId: $emplacement->id,
+                    quantite:      $qteEff,
+                    coutUnitaire:  $coutUnitaireLigne,
+                    typeMouvement: TypeMouvement::ENTREE_PRODUCTION,
+                    lotId:         $lot->id,
+                    productionId:  $production->id,
+                    motif:         "Production {$production->reference} — Lot {$lot->reference}",
+                );
+            }
         }
 
-        // Calcul du rendement : valorisation sorties / coût entrées
-        $rendement = $coutTotalEntrant > 0
-            ? $totalValorisationSortie / $coutTotalEntrant
-            : 0;
+        // Rendement POIDS = poids total des produits obtenus (kg) / poids total entrant (kg)
+        // C'est la métrique standard en abattage avicole.
+        // Ex : 75% = 75% du poids des poulets vivants est récupéré en produits utilisables.
+        // On ne prend que les lignes avec une quantité en kg (quantite > 0).
+        $poidsObtenus    = (float) $lignes->sum('quantite');
+        $poidsEntrant    = (float) ($production->poids_total_entrant ?? 0);
+        $rendement       = ($poidsEntrant > 0 && $poidsObtenus > 0)
+            ? $poidsObtenus / $poidsEntrant
+            : null; // null = non calculable (poids non renseignés)
 
         // Mise à jour de la production
         $production->update([
-            'statut' => StatutProduction::VALIDEE->value,
-            'rendement' => round($rendement, 4),
-            'valide_par' => auth()->id(),
+            'statut'          => StatutProduction::VALIDEE->value,
+            'rendement'       => $rendement !== null ? round($rendement, 4) : null,
+            'valide_par'      => auth()->id(),
             'date_validation' => now(),
         ]);
 

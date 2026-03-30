@@ -169,4 +169,11 @@ class EauProductionResource extends Resource
             'edit'   => Pages\EditEauProduction::route('/{record}/edit'),
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            EauProductionResource\Widgets\EauStatsWidget::class,
+        ];
+    }
 }

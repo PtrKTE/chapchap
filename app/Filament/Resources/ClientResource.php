@@ -304,4 +304,11 @@ class ClientResource extends Resource
             'edit'   => Pages\EditClient::route('/{record}/edit'),
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            ClientResource\Widgets\ClientStatsWidget::class,
+        ];
+    }
 }

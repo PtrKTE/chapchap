@@ -204,4 +204,11 @@ class StockEmplacementResource extends Resource
             'index' => Pages\ListStockEmplacements::route('/'),
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            StockEmplacementResource\Widgets\StockStatsWidget::class,
+        ];
+    }
 }
