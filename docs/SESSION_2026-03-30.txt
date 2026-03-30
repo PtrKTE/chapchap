@@ -1,0 +1,172 @@
+================================================================================
+CHAPCHAP — RÉCAPITULATIF SESSION DU 2026-03-30
+================================================================================
+
+ENVIRONNEMENT
+─────────────
+- Projet    : /Applications/MAMP/htdocs/chapchap/
+- App prod  : https://app.chapchap-ci.com/admin
+- VPS       : vps114082.serveur-vps.net / 192.162.69.224 (OVH Ubuntu 24.04)
+- App path  : /home/Tetchi/web/app.chapchap-ci.com/project/
+- DB locale : chapchap (MAMP Pro / MySQL socket)
+- Laravel   : 12 / Filament 3 / PHP 8.4
+
+================================================================================
+1. DÉPLOIEMENT EN PRODUCTION — RÉSOLUTION PROBLÈME SSH
+================================================================================
+
+PROBLÈME :
+  SSH refusé depuis la machine locale.
+  Tentative avec mauvais utilisateur (patricktetchi au lieu de root).
+  Port 22 accessible via nc mais SSH répondait "Connection refused" depuis
+  les outils Claude (pas de clé SSH configurée côté Claude).
+
+SOLUTION :
+  Connexion via la console KVM OVH (panel manager.ovh.com → VPS → Console KVM).
+  Accès avec root + mot de passe root OVH.
+
+COMMANDES DÉPLOIEMENT EXÉCUTÉES SUR LE VPS :
+  cd /home/Tetchi/web/app.chapchap-ci.com/project/
+  git pull origin main
+  composer install --no-dev --optimize-autoloader
+  php artisan migrate --force
+  php artisan optimize
+
+RÉSULTAT :
+  33 objets git récupérés, 20 fichiers mis à jour.
+  3 migrations appliquées :
+    - add_quantite_unite_to_production_lignes      ✓
+    - make_quantite_nullable_in_production_lignes  ✓
+    - add_poids_total_to_lots_table                ✓
+  Config/routes/views/filament cachés.
+
+COMMIT DÉPLOYÉ : e868b17
+
+NOTE :
+  Pour les prochains déploiements, utiliser la console KVM OVH
+  (manager.ovh.com → VPS → Console KVM → login root).
+  GitHub Actions non encore configuré (reporté).
+
+================================================================================
+2. FIX MODULE INVENTAIRE — ÉCARTS INCORRECTS (= 0)
+================================================================================
+
+PROBLÈME CONSTATÉ EN PRODUCTION :
+  Tous les écarts affichaient 0,000 dans la vue détail (infolist),
+  même quand stock_physique ≠ stock_theorique.
+  Ex : Poulet effilé → Théorique 350 / Physique 400 → Écart affiché : 0,000
+
+CAUSE RACINE :
+  1. Le bouton "Charger tous les produits" initialise ecart = 0 dans le Repeater.
+  2. L'afterStateUpdated sur stock_physique calcule l'écart côté client (Livewire),
+     mais si la réactivité ne se déclenche pas correctement, la valeur reste 0.
+  3. L'infolist lisait directement la colonne `ecart` de la DB (valeur stockée = 0).
+  4. La méthode validerInventaire() utilisait aussi $ligne->ecart (valeur DB).
+
+CORRECTIONS APPORTÉES :
+
+  A) InventaireResource.php — Infolist
+     - TextEntry::make('ecart') remplacé par TextEntry::make('ecart_calcule')
+     - getStateUsing() calcule dynamiquement : round(physique - theorique, 3)
+     - Section "Résumé des ajustements" : tous les calculs (pertes/gains/impact/count)
+       passent par round(stock_physique - stock_theorique, 3) au lieu de $ligne->ecart
+
+  B) EditInventaire.php
+     - validerInventaire() : vérification justifications et calcul écarts par
+       round(stock_physique - stock_theorique, 3) au lieu de $ligne->ecart
+     - Ajout mutateFormDataBeforeSave() : recalcule et persiste ecart avant chaque save
+
+  C) CreateInventaire.php
+     - Ajout mutateFormDataBeforeSave dans mutateFormDataBeforeCreate() :
+       recalcule ecart = physique - theorique pour chaque ligne avant création
+
+PRINCIPE RETENU :
+  L'écart est toujours recalculé dynamiquement depuis physique - theorique.
+  La colonne `ecart` en DB reste cohérente grâce à mutateFormDataBeforeSave,
+  mais n'est jamais utilisée comme source de vérité pour l'affichage.
+
+COMMITS :
+  a06439c — fix(inventaire): recalcul dynamique écart physique−théorique
+
+FICHIERS MODIFIÉS :
+  app/Filament/Resources/InventaireResource.php
+  app/Filament/Resources/InventaireResource/Pages/EditInventaire.php
+  app/Filament/Resources/InventaireResource/Pages/CreateInventaire.php
+
+================================================================================
+3. COMMANDE ARTISAN — RÉINITIALISATION DONNÉES TRANSACTIONNELLES
+================================================================================
+
+CONTEXTE :
+  Besoin de repartir sur une base saine en production (supprimer les données
+  de test) pour les modules : Trésorerie, Commercial, Achat, Production, Stock.
+
+COMMANDE CRÉÉE :
+  php artisan chapchap:reset-donnees [--force]
+
+TABLES VIDÉES (dans l'ordre des FK) :
+  inventaire_lignes, inventaires
+  transfert_lignes, transferts
+  mouvements_stock, stock_emplacements
+  production_lignes, productions
+  lots
+  charges, caisses
+  paiements, vente_lignes, ventes
+  eau_productions
+
+TABLES CONSERVÉES (référentiels intacts) :
+  users, emplacements, fournisseurs, produits,
+  categories_charges, grilles_rendement,
+  roles, permissions, model_has_roles, model_has_permissions
+
+FONCTIONNEMENT :
+  - Demande confirmation interactive sauf si --force
+  - SET FOREIGN_KEY_CHECKS=0 avant / 1 après pour éviter les erreurs FK
+  - Affiche le nombre d'enregistrements supprimés par table
+  - Testé en local : 15 tables vidées avec les comptages corrects
+
+RÉSULTAT APRÈS EXÉCUTION SUR LE VPS :
+  La base de production est propre et prête pour les vraies données métier.
+
+COMMIT :
+  b37aaeb — feat: commande artisan chapchap:reset-donnees
+
+FICHIER CRÉÉ :
+  app/Console/Commands/ResetDonneesTransactionnelles.php
+
+================================================================================
+4. LISTE COMPLÈTE DES COMMITS DE CETTE SESSION
+================================================================================
+
+  a06439c  fix(inventaire): recalcul dynamique écart physique−théorique
+  b37aaeb  feat: commande artisan chapchap:reset-donnees
+
+================================================================================
+5. ÉTAT DE L'APPLICATION EN PRODUCTION (FIN DE SESSION)
+================================================================================
+
+  Module Lots          → Opérationnel (poids_total_lot, coûts, auto-fill facture)
+  Module Productions   → Opérationnel (auto-fill produits, coût prorata, rendement)
+  Module Inventaires   → Opérationnel (chargement produits, écarts colorés, résumé)
+  Module Stock         → Opérationnel (mouvements, transferts, stock_emplacements)
+  Module Ventes        → Opérationnel
+  Module Caisse        → Opérationnel
+  Module Charges       → Opérationnel
+  Module Eau           → Opérationnel
+  RBAC Filament Shield → Opérationnel (8 rôles configurés)
+  Base de données prod → Réinitialisée (données test supprimées, référentiels OK)
+
+================================================================================
+6. PROCHAINES ÉTAPES
+================================================================================
+
+  - [ ] Saisir les vraies données de production (lots, productions, ventes)
+  - [ ] S9 — Dashboards KPI par profil (CA jour, marge, stocks, impayés)
+  - [ ] Configurer GitHub Actions pour auto-déploiement sur git push
+  - [ ] S11 — Recettage complet (tests PHPUnit, corrections UX, mobile)
+  - [ ] S12 — Backups automatiques + guide utilisateur
+  - [ ] Saisie vente rapide Livewire (mobile-first pour commerciaux terrain)
+
+================================================================================
+Fin du récapitulatif — Session 2026-03-30
+================================================================================
