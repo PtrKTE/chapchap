@@ -22,6 +22,22 @@ class EditInventaire extends EditRecord
 {
     protected static string $resource = InventaireResource::class;
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // Recalculer l'écart pour chaque ligne avant sauvegarde
+        if (isset($data['lignes'])) {
+            $data['lignes'] = array_map(function (array $ligne): array {
+                $ligne['ecart'] = round(
+                    (float) ($ligne['stock_physique'] ?? 0) - (float) ($ligne['stock_theorique'] ?? 0),
+                    3
+                );
+                return $ligne;
+            }, $data['lignes']);
+        }
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -84,8 +100,9 @@ class EditInventaire extends EditRecord
         }
 
         // Vérifier que les écarts ont une justification
+        // On calcule l'écart dynamiquement (physique - théorique) car la colonne ecart peut être obsolète
         $ecartsSansJustification = $lignes->filter(function ($l) {
-            $ecart = (float) $l->ecart;
+            $ecart = round((float) $l->stock_physique - (float) $l->stock_theorique, 3);
 
             return abs($ecart) > 0.001 && empty($l->justification);
         });
@@ -106,7 +123,8 @@ class EditInventaire extends EditRecord
             $nbAjustements = 0;
 
             foreach ($lignes as $ligne) {
-                $ecart = (float) $ligne->ecart;
+                // Calcul dynamique : physique - théorique (source de vérité)
+                $ecart = round((float) $ligne->stock_physique - (float) $ligne->stock_theorique, 3);
 
                 if (abs($ecart) < 0.001) {
                     continue; // Pas d'écart significatif

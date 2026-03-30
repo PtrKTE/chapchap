@@ -29,6 +29,17 @@ class CreateInventaire extends CreateRecord
         $data['created_by'] = auth()->id();
         $data['statut'] = StatutInventaire::EN_COURS->value;
 
+        // Recalculer l'écart pour chaque ligne avant sauvegarde
+        if (isset($data['lignes'])) {
+            $data['lignes'] = array_map(function (array $ligne): array {
+                $ligne['ecart'] = round(
+                    (float) ($ligne['stock_physique'] ?? 0) - (float) ($ligne['stock_theorique'] ?? 0),
+                    3
+                );
+                return $ligne;
+            }, $data['lignes']);
+        }
+
         return $data;
     }
 

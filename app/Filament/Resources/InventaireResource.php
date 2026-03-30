@@ -59,7 +59,10 @@ class InventaireResource extends Resource
                             Infolists\Components\TextEntry::make('produit.nom')->label('Produit')->weight('bold'),
                             Infolists\Components\TextEntry::make('stock_theorique')->label('Théorique')->numeric(3),
                             Infolists\Components\TextEntry::make('stock_physique')->label('Physique')->numeric(3),
-                            Infolists\Components\TextEntry::make('ecart')->label('Écart')->numeric(3)
+                            Infolists\Components\TextEntry::make('ecart_calcule')
+                                ->label('Écart')
+                                ->getStateUsing(fn($record) => round((float) $record->stock_physique - (float) $record->stock_theorique, 3))
+                                ->numeric(3)
                                 ->color(fn($state) => (float) $state == 0 ? 'success' : ((float) $state > 0 ? 'info' : 'danger')),
                             Infolists\Components\TextEntry::make('justification')->label('Justification')->placeholder('—'),
                         ])->columns(5),
@@ -73,7 +76,7 @@ class InventaireResource extends Resource
                     Infolists\Components\TextEntry::make('nb_avec_ecart')
                         ->label('Produits avec écart')
                         ->getStateUsing(fn(Inventaire $record): string =>
-                            $record->lignes->filter(fn($l) => abs((float) $l->ecart) > 0.001)->count()
+                            $record->lignes->filter(fn($l) => abs((float) $l->stock_physique - (float) $l->stock_theorique) > 0.001)->count()
                             . ' / ' . $record->lignes->count()
                         ),
                     Infolists\Components\TextEntry::make('valeur_pertes')
@@ -81,7 +84,7 @@ class InventaireResource extends Resource
                         ->getStateUsing(function (Inventaire $record): string {
                             $total = 0;
                             foreach ($record->lignes as $ligne) {
-                                $ecart = (float) $ligne->ecart;
+                                $ecart = round((float) $ligne->stock_physique - (float) $ligne->stock_theorique, 3);
                                 if ($ecart >= 0) continue;
                                 $cmp = (float) StockEmplacement::where('produit_id', $ligne->produit_id)
                                     ->where('emplacement_id', $record->emplacement_id)
@@ -96,7 +99,7 @@ class InventaireResource extends Resource
                         ->getStateUsing(function (Inventaire $record): string {
                             $total = 0;
                             foreach ($record->lignes as $ligne) {
-                                $ecart = (float) $ligne->ecart;
+                                $ecart = round((float) $ligne->stock_physique - (float) $ligne->stock_theorique, 3);
                                 if ($ecart <= 0) continue;
                                 $cmp = (float) StockEmplacement::where('produit_id', $ligne->produit_id)
                                     ->where('emplacement_id', $record->emplacement_id)
@@ -111,7 +114,7 @@ class InventaireResource extends Resource
                         ->getStateUsing(function (Inventaire $record): string {
                             $net = 0;
                             foreach ($record->lignes as $ligne) {
-                                $ecart = (float) $ligne->ecart;
+                                $ecart = round((float) $ligne->stock_physique - (float) $ligne->stock_theorique, 3);
                                 if (abs($ecart) < 0.001) continue;
                                 $cmp = (float) StockEmplacement::where('produit_id', $ligne->produit_id)
                                     ->where('emplacement_id', $record->emplacement_id)
@@ -121,7 +124,7 @@ class InventaireResource extends Resource
                             $signe = $net >= 0 ? '+' : '';
                             return $signe . number_format($net, 0, ',', ' ') . ' FCFA';
                         })
-                        ->color(fn(Inventaire $record): string => $record->lignes->sum('ecart') >= 0 ? 'success' : 'danger')
+                        ->color(fn(Inventaire $record): string => $record->lignes->sum(fn($l) => (float) $l->stock_physique - (float) $l->stock_theorique) >= 0 ? 'success' : 'danger')
                         ->weight('bold'),
                 ])->columns(4),
 
