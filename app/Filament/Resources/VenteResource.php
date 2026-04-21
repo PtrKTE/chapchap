@@ -218,7 +218,10 @@ class VenteResource extends Resource
                         ->default(now())
                         ->native(false)
                         ->displayFormat('d/m/Y H:i')
-                        ->disabled(fn () => ! auth()->user()?->hasRole('gerant')),
+                        ->disabled(fn () => ! (
+                            auth()->user()?->hasRole(['gerant', 'super_admin']) ||
+                            auth()->user()?->profil === \App\Enums\Profil::GERANT
+                        )),
 
                     // Sélection du client avec recherche et création rapide
                     Forms\Components\Select::make('client_id')
