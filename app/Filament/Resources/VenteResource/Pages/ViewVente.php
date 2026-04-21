@@ -197,7 +197,7 @@ class ViewVente extends ViewRecord
                 foreach ($vente->lignes()->with('produit')->get() as $ligne) {
                     $stockService->entree(
                         produitId: $ligne->produit_id,
-                        emplacementId: $vente->emplacement_id,
+                        emplacementId: (int) $vente->emplacement_id,
                         quantite: (float) $ligne->quantite,
                         coutUnitaire: (float) $ligne->cout_revient,
                         typeMouvement: TypeMouvement::ENTREE_ANNULATION,

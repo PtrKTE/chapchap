@@ -101,7 +101,7 @@ class CreateVente extends CreateRecord
                 foreach ($lignes as $ligne) {
                     $mouvement = $stockService->sortie(
                         produitId: $ligne->produit_id,
-                        emplacementId: $vente->emplacement_id,
+                        emplacementId: (int) $vente->emplacement_id,
                         quantite: (float) $ligne->quantite,
                         typeMouvement: \App\Enums\TypeMouvement::SORTIE_VENTE,
                         venteId: $vente->id,

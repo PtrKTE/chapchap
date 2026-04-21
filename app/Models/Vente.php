@@ -40,6 +40,10 @@ class Vente extends Model
     protected function casts(): array
     {
         return [
+            'emplacement_id'  => 'integer',
+            'client_id'       => 'integer',
+            'commercial_id'   => 'integer',
+            'created_by'      => 'integer',
             'date_vente' => 'datetime',
             'canal' => Canal::class,
             'statut_paiement' => StatutPaiement::class,
