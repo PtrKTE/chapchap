@@ -218,10 +218,7 @@ class VenteResource extends Resource
                         ->default(now())
                         ->native(false)
                         ->displayFormat('d/m/Y H:i')
-                        ->disabled(fn () => ! auth()->user()?->hasRole('gerant'))
-                        ->helperText(fn () => auth()->user()?->hasRole('gerant')
-                            ? null
-                            : 'Date verrouillée. Seul le gérant peut la modifier.'),
+                        ->disabled(fn () => ! auth()->user()?->hasRole('gerant')),
 
                     // Sélection du client avec recherche et création rapide
                     Forms\Components\Select::make('client_id')
