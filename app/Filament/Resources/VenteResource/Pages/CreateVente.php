@@ -30,8 +30,10 @@ class CreateVente extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Numéro de reçu auto : REC-YYYYMMDD-XXX
+        // On compte par préfixe du numéro (pas par date_vente) pour éviter les doublons
+        // quand l'utilisateur choisit une date_vente passée ou future
         $date = now()->format('Ymd');
-        $count = Vente::whereDate('date_vente', today())->count() + 1;
+        $count = Vente::where('numero_recu', 'like', "REC-{$date}-%")->count() + 1;
         $data['numero_recu'] = sprintf('REC-%s-%03d', $date, $count);
 
         // Utilisateur connecté
