@@ -218,7 +218,7 @@ class VenteResource extends Resource
                         ->default(now())
                         ->native(false)
                         ->displayFormat('d/m/Y H:i')
-                        ->disabled(fn () => ! (
+                        ->readOnly(fn () => ! (
                             auth()->user()?->hasRole(['gerant', 'super_admin']) ||
                             auth()->user()?->profil === \App\Enums\Profil::GERANT
                         )),
