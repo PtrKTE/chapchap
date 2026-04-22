@@ -31,7 +31,7 @@ class PerformanceCommerciauxTable extends BaseWidget
 {
     use WidgetVisibleParProfil;
 
-    protected static ?string $heading = 'Performance commerciaux — mois en cours';
+    protected static ?string $heading = 'Performance commerciaux : mois en cours';
 
     protected int|string|array $columnSpan = 'full';
 

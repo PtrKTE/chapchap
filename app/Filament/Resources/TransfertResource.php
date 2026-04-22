@@ -47,7 +47,6 @@ class TransfertResource extends Resource
                     Infolists\Components\TextEntry::make('emplacementSource.nom')->label('Source')->icon('heroicon-o-arrow-up-tray'),
                     Infolists\Components\TextEntry::make('emplacementDest.nom')->label('Destination')->icon('heroicon-o-arrow-down-tray'),
                     Infolists\Components\TextEntry::make('statut')->label('Statut')->badge(),
-                    Infolists\Components\TextEntry::make('createdBy.name')->label('Créé par')->placeholder('—'),
                 ])->columns(3),
 
             Infolists\Components\Section::make('Produits transférés')
@@ -58,18 +57,13 @@ class TransfertResource extends Resource
                         ->schema([
                             Infolists\Components\TextEntry::make('produit.nom')->label('Produit')->weight('bold'),
                             Infolists\Components\TextEntry::make('quantite_envoyee')->label('Qté envoyée')->numeric(3),
-                            Infolists\Components\TextEntry::make('quantite_recue')->label('Qté reçue')->numeric(3)->placeholder('—'),
                             Infolists\Components\TextEntry::make('ecart')->label('Écart')->numeric(3)
                                 ->color(fn($state) => $state && (float) $state != 0 ? 'danger' : 'success')
-                                ->placeholder('—'),
                         ])->columns(4),
                 ]),
 
             Infolists\Components\Section::make('Réception')
                 ->schema([
-                    Infolists\Components\TextEntry::make('recuPar.name')->label('Reçu par')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('date_reception')->label('Date réception')->dateTime('d/m/Y H:i')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('observations')->label('Observations')->placeholder('—')->columnSpanFull(),
                 ])->columns(2)
                 ->collapsible(),
         ]);

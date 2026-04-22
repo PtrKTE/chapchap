@@ -53,7 +53,7 @@
     <div class="header">
         <h1>CHAPCHAP</h1>
         <h2>Rapport de Caisse</h2>
-        <p>{{ $caisse->emplacement?->nom ?? '—' }} — {{ $caisse->date_caisse->format('d/m/Y') }}</p>
+        <p>{{ $caisse->emplacement?->nom ?? '' }} - {{ $caisse->date_caisse->format('d/m/Y') }}</p>
     </div>
 
     {{-- Statut --}}
@@ -102,7 +102,7 @@
                 <tbody>
                     @foreach ($charges as $charge)
                         <tr>
-                            <td>{{ $charge->categorie?->nom ?? '—' }}</td>
+                            <td>{{ $charge->categorie?->nom ?? '' }}</td>
                             <td>{{ $charge->libelle }}</td>
                             <td class="num">{{ number_format((float) $charge->montant, 0, ',', ' ') }}</td>
                         </tr>
@@ -158,11 +158,11 @@
     <div class="{{ $ecart == 0 ? 'ecart-ok' : 'ecart-ko' }}">
         Écart : {{ number_format($ecart, 0, ',', ' ') }} FCFA
         @if ($ecart == 0)
-            — Caisse équilibrée
+            - Caisse équilibrée
         @elseif ($ecart > 0)
-            — Excédent de caisse
+            - Excédent de caisse
         @else
-            — Manquant de caisse
+            - Manquant de caisse
         @endif
     </div>
 
@@ -191,7 +191,7 @@
 
     {{-- Pied de page --}}
     <div class="footer">
-        Rapport généré le {{ now()->format('d/m/Y à H:i') }} — CHAPCHAP — Boucherie & Transformation de Volailles
+        Rapport généré le {{ now()->format('d/m/Y à H:i') }} - CHAPCHAP - Boucherie & Transformation de Volailles
     </div>
 </body>
 </html>

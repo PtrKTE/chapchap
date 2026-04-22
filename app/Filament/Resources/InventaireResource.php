@@ -64,7 +64,6 @@ class InventaireResource extends Resource
                                 ->getStateUsing(fn($record) => round((float) $record->stock_physique - (float) $record->stock_theorique, 3))
                                 ->numeric(3)
                                 ->color(fn($state) => (float) $state == 0 ? 'success' : ((float) $state > 0 ? 'info' : 'danger')),
-                            Infolists\Components\TextEntry::make('justification')->label('Justification')->placeholder('—'),
                         ])->columns(5),
                 ]),
 
@@ -130,9 +129,6 @@ class InventaireResource extends Resource
 
             Infolists\Components\Section::make('Validation')
                 ->schema([
-                    Infolists\Components\TextEntry::make('createdBy.name')->label('Créé par')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('validePar.name')->label('Validé par')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('observations')->label('Observations')->placeholder('—')->columnSpanFull(),
                 ])->columns(2)
                 ->collapsible(),
         ]);

@@ -51,11 +51,6 @@ class MouvementStockResource extends Resource
 
             Infolists\Components\Section::make('Traçabilité')
                 ->schema([
-                    Infolists\Components\TextEntry::make('lot.reference')->label('Lot')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('production.reference')->label('Production')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('transfert.reference')->label('Transfert')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('createdBy.name')->label('Par')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('motif')->label('Motif')->placeholder('—')->columnSpanFull(),
                 ])->columns(4)
                 ->collapsible(),
         ]);

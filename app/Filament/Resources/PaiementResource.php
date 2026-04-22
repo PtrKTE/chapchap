@@ -70,11 +70,9 @@ class PaiementResource extends Resource
 
                     Infolists\Components\TextEntry::make('reference_paiement')
                         ->label('Référence')
-                        ->placeholder('—'),
 
                     Infolists\Components\TextEntry::make('observations')
                         ->label('Observations')
-                        ->placeholder('—')
                         ->columnSpanFull(),
 
                     Infolists\Components\TextEntry::make('createdBy.name')
@@ -179,12 +177,12 @@ class PaiementResource extends Resource
                             ]) . "\n";
                             foreach ($records as $paiement) {
                                 $csv .= implode(',', [
-                                    $paiement->vente?->numero_recu ?? '—',
-                                    '"' . ($paiement->vente?->client?->nom ?? '—') . '"',
+                                    $paiement->vente?->numero_recu ?? '',
+                                    '"' . ($paiement->vente?->client?->nom ?? '') . '"',
                                     $paiement->date_paiement->format('d/m/Y H:i'),
                                     (float) $paiement->montant,
-                                    $paiement->mode_paiement?->getLabel() ?? '—',
-                                    '"' . ($paiement->createdBy?->name ?? '—') . '"',
+                                    $paiement->mode_paiement?->getLabel() ?? '',
+                                    '"' . ($paiement->createdBy?->name ?? '') . '"',
                                 ]) . "\n";
                             }
                             echo $csv;

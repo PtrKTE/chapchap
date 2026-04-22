@@ -71,11 +71,9 @@ class ViewClient extends ViewRecord
                     Infolists\Components\TextEntry::make('telephone')
                         ->label('Téléphone')
                         ->icon('heroicon-o-phone')
-                        ->placeholder('—'),
                     Infolists\Components\TextEntry::make('email')
                         ->label('Email')
                         ->icon('heroicon-o-envelope')
-                        ->placeholder('—'),
                     Infolists\Components\IconEntry::make('actif')
                         ->label('Actif')
                         ->boolean(),
@@ -87,24 +85,18 @@ class ViewClient extends ViewRecord
                 ->schema([
                     Infolists\Components\TextEntry::make('adresse')
                         ->label('Adresse')
-                        ->placeholder('—'),
                     Infolists\Components\TextEntry::make('quartier_zone')
                         ->label('Quartier / Zone')
-                        ->placeholder('—'),
                     Infolists\Components\TextEntry::make('commercial.name')
                         ->label('Commercial')
                         ->icon('heroicon-o-briefcase')
-                        ->placeholder('—'),
                     Infolists\Components\TextEntry::make('mode_paiement_habituel')
                         ->label('Mode paiement habituel')
                         ->badge()
-                        ->placeholder('—'),
                     Infolists\Components\TextEntry::make('contact_principal')
                         ->label('Contact')
-                        ->placeholder('—'),
                     Infolists\Components\TextEntry::make('conditions_paiement')
                         ->label('Conditions')
-                        ->placeholder('—'),
                 ])->columns(3)
                 ->collapsible(),
 

@@ -1,0 +1,1420 @@
+==================================================
+  HISTOIRE COMPLETE DU PROJET -- RSI
+==================================================
+
+Genere le : 30/03/2026 a 13:35
+Projet    : chapchap
+Chemin    : /Applications/MAMP/htdocs/chapchap
+
+--------------------------------------------------
+  1. IDENTITE DU PROJET
+--------------------------------------------------
+
+Nom du projet : chapchap
+
+Stack technique detectee :
+  [Node.js / JavaScript]
+  dep: autoprefixer ^10.4.20
+  dep: axios ^1.7.4
+  dep: concurrently ^9.0.1
+  dep: laravel-vite-plugin ^1.2.0
+  dep: postcss ^8.4.47
+  dep: tailwindcss ^3.4.13
+  dep: vite ^6.0.11
+  [PHP / Laravel]
+  dep: php ^8.2
+  dep: barryvdh/laravel-dompdf ^3.1
+  dep: bezhansalleh/filament-shield ^3.0
+  dep: filament/filament ^3.0
+  dep: laravel/framework ^12.0
+  dep: laravel/tinker ^2.9
+  dep: maatwebsite/excel ^3.1
+  dep: mpdf/mpdf ^8.3
+  dep: spatie/laravel-backup ^9.3
+  dep: spatie/laravel-permission ^6.0
+
+Naissance du projet (1er commit) :
+  19/02/2026 a 19:54 -- feat: setup initial projet CHAPCHAP - Phase S1
+
+Dernier commit :
+  30/03/2026 a 00:45 -- docs: SESSION_2026-03-30 — déploiement VPS + fix inventaire écarts + reset DB prod
+
+Age du projet :
+  38 jours de developpement
+
+Total commits        : 24
+Total tags/versions  : 0
+Branches             : * main   remotes/origin/main 
+
+--------------------------------------------------
+  2. GENESE -- LE DEBUT DU PROJET
+--------------------------------------------------
+
+5 premiers commits :
+  [19/02/2026 19:54] feat: setup initial projet CHAPCHAP - Phase S1
+  Hash : 8ffcbab
+  Detail : - Laravel 11.48.0 (compatible PHP 8.2+ / XAMPP)
+- Filament v3.3.48 avec panel admin
+- Livewire v3.7.10 (inclus avec Filament)
+- Spatie Laravel Permission v6.24.1
+- Filament Shield v3.9.10
+- DomPDF v3.1.1
+- Maatwebsite Excel v3.1.67
+- 13 Enums PHP (Profil, StatutFacture, TypeMouvement, etc.)
+- 7 rôles RBAC (super_admin + 6 métier)
+- MariaDB configurée (DB: chapchap)
+- Super admin: admin@chapchap.ci
+- Plateforme PHP forcée à 8.2.4 pour compatibilité XAMPP
+
+  ---
+  [13/03/2026 23:07] feat: Phase S2 — BDD complète, Models, Filament Resources, Services, Policies et page Coming Soon
+  Hash : 1686ec1
+  Detail : - 23 migrations créées (emplacements → eau_productions + index performance)
+- 18 Models Eloquent avec relations bidirectionnelles et méthodes métier
+- 13 Enums PHP 8.1 (StatutFacture, TypeMouvement, Canal, Profil, etc.)
+- Resources Filament 3 pour tous les modules (Lots, Ventes, Stock, Production, Caisse, etc.)
+- Services métier : StockService, MargeService, CaisseService, LotService, ProductionService
+- Observers : VenteObserver, ProductionObserver, LotObserver, TransfertObserver
+- Policies RBAC pour tous les modèles (5 profils : gerant, resp_operations, etc.)
+- Seeders : Produits, Emplacements, Fournisseurs, CategorieCharges, GrilleRendement, RolePermissions
+- Tests PHPUnit : LotCalculsTest, StockServiceTest, VenteFlowTest
+- Exports Excel (Ventes, Lots, Stock, Clients, Caisses, Charges)
+- Page Coming Soon premium (HTML/CSS/JS) avec compte à rebours et particules animées
+- Guide de déploiement Hestia VPS complet (18 étapes)
+- Script deploy.sh pour mises à jour en production
+
+  ---
+  [13/03/2026 23:24] refactor: reorganisation du projet + 4 nouveaux services métier
+  Hash : e1ddc04
+  Detail : Réorganisation des fichiers :
+- docs/guides/ : GUIDE_UTILISATEUR, GUIDE_DEPLOIEMENT, GUIDE_DEPLOIEMENT_HESTIA
+- docs/presentations/ : PRESENTATION_CHAPCHAP (html, pptx, v1), Comparatif
+- docs/workflows/ : WORKFLOW_CHAPCHAP (v1 et v2)
+- scripts/ : generate_pptx.py, generate_workflow_doc.py
+
+Nouveaux services métier (app/Services/) :
+- MargeService : calcul marges par vente, lot, produit, commercial et période
+- CaisseService : ouverture, clôture, validation, recalcul, versements, résumé
+- LotService : création, calculs automatiques, règlements, disponibilité production
+- ProductionService : création, validation (→ stock auto), rendement, grille suggérée
+
+  ---
+  [21/03/2026 17:55] feat: S3 — Module Lots complet (ViewLot + action règlement + stats widget + onglets)
+  Hash : d5e8c3c
+  Detail : 
+  ---
+  [21/03/2026 18:15] feat: S4 — Module Production complet (ViewProduction + stats widget + onglets)
+  Hash : 90820c5
+  Detail : 
+  ---
+  [21/03/2026 18:42] feat: S5 — Module Stock complet (ViewTransfert + ViewInventaire + StockStats + onglets)
+  Hash : cc52b3d
+  Detail : 
+  ---
+
+Structure du 1er commit :
+commit 8ffcbab3251a0d6f25199a84e86f2adfd11a34d9
+Author: PTRKE <patrick.tetchi@outlook.com>
+Date:   Thu Feb 19 19:54:54 2026 +0000
+
+    feat: setup initial projet CHAPCHAP - Phase S1
+    
+    - Laravel 11.48.0 (compatible PHP 8.2+ / XAMPP)
+    - Filament v3.3.48 avec panel admin
+    - Livewire v3.7.10 (inclus avec Filament)
+    - Spatie Laravel Permission v6.24.1
+    - Filament Shield v3.9.10
+    - DomPDF v3.1.1
+    - Maatwebsite Excel v3.1.67
+    - 13 Enums PHP (Profil, StatutFacture, TypeMouvement, etc.)
+    - 7 rôles RBAC (super_admin + 6 métier)
+    - MariaDB configurée (DB: chapchap)
+    - Super admin: admin@chapchap.ci
+    - Plateforme PHP forcée à 8.2.4 pour compatibilité XAMPP
+
+ .editorconfig                                      |    18 +
+ .env.example                                       |    66 +
+ .gitattributes                                     |    11 +
+ .gitignore                                         |    31 +
+ CLAUDE.md                                          |   855 ++
+ README.md                                          |    66 +
+ app/Enums/Canal.php                                |    23 +
+ app/Enums/CategorieProduit.php                     |    27 +
+ app/Enums/ModePaiement.php                         |    25 +
+ app/Enums/Profil.php                               |    30 +
+ app/Enums/StatutCaisse.php                         |    30 +
+ app/Enums/StatutFacture.php                        |    30 +
+ app/Enums/StatutPaiement.php                       |    33 +
+ app/Enums/StatutProduction.php                     |    30 +
+ app/Enums/StatutTransfert.php                      |    30 +
+ app/Enums/TypeCharge.php                           |    19 +
+ app/Enums/TypeClient.php                           |    33 +
+ app/Enums/TypeEmplacement.php                      |    21 +
+ app/Enums/TypeMouvement.php                        |    46 +
+ app/Http/Controllers/Controller.php                |     8 +
+ app/Models/User.php                                |    53 +
+
+--------------------------------------------------
+  3. TIMELINE CHRONOLOGIQUE COMPLETE
+--------------------------------------------------
+
+Tous les commits (du plus ancien au plus recent) :
+
+  DATE    : 19/02/2026 a 19:54
+  COMMIT  : feat: setup initial projet CHAPCHAP - Phase S1
+  HASH    : 8ffcbab
+  DETAIL  : - Laravel 11.48.0 (compatible PHP 8.2+ / XAMPP)
+- Filament v3.3.48 avec panel admin
+- Livewire v3.7.10 (inclus avec Filament)
+- Spatie Laravel Permission v6.24.1
+- Filament Shield v3.9.10
+- DomPDF v3.1.1
+- Maatwebsite Excel v3.1.67
+- 13 Enums PHP (Profil, StatutFacture, TypeMouvement, etc.)
+- 7 rôles RBAC (super_admin + 6 métier)
+- MariaDB configurée (DB: chapchap)
+- Super admin: admin@chapchap.ci
+- Plateforme PHP forcée à 8.2.4 pour compatibilité XAMPP
+
+  --------------------------------
+  DATE    : 13/03/2026 a 23:07
+  COMMIT  : feat: Phase S2 — BDD complète, Models, Filament Resources, Services, Policies et page Coming Soon
+  HASH    : 1686ec1
+  DETAIL  : - 23 migrations créées (emplacements → eau_productions + index performance)
+- 18 Models Eloquent avec relations bidirectionnelles et méthodes métier
+- 13 Enums PHP 8.1 (StatutFacture, TypeMouvement, Canal, Profil, etc.)
+- Resources Filament 3 pour tous les modules (Lots, Ventes, Stock, Production, Caisse, etc.)
+- Services métier : StockService, MargeService, CaisseService, LotService, ProductionService
+- Observers : VenteObserver, ProductionObserver, LotObserver, TransfertObserver
+- Policies RBAC pour tous les modèles (5 profils : gerant, resp_operations, etc.)
+- Seeders : Produits, Emplacements, Fournisseurs, CategorieCharges, GrilleRendement, RolePermissions
+- Tests PHPUnit : LotCalculsTest, StockServiceTest, VenteFlowTest
+- Exports Excel (Ventes, Lots, Stock, Clients, Caisses, Charges)
+- Page Coming Soon premium (HTML/CSS/JS) avec compte à rebours et particules animées
+- Guide de déploiement Hestia VPS complet (18 étapes)
+- Script deploy.sh pour mises à jour en production
+
+  --------------------------------
+  DATE    : 13/03/2026 a 23:24
+  COMMIT  : refactor: reorganisation du projet + 4 nouveaux services métier
+  HASH    : e1ddc04
+  DETAIL  : Réorganisation des fichiers :
+- docs/guides/ : GUIDE_UTILISATEUR, GUIDE_DEPLOIEMENT, GUIDE_DEPLOIEMENT_HESTIA
+- docs/presentations/ : PRESENTATION_CHAPCHAP (html, pptx, v1), Comparatif
+- docs/workflows/ : WORKFLOW_CHAPCHAP (v1 et v2)
+- scripts/ : generate_pptx.py, generate_workflow_doc.py
+
+Nouveaux services métier (app/Services/) :
+- MargeService : calcul marges par vente, lot, produit, commercial et période
+- CaisseService : ouverture, clôture, validation, recalcul, versements, résumé
+- LotService : création, calculs automatiques, règlements, disponibilité production
+- ProductionService : création, validation (→ stock auto), rendement, grille suggérée
+
+  --------------------------------
+  DATE    : 21/03/2026 a 17:55
+  COMMIT  : feat: S3 — Module Lots complet (ViewLot + action règlement + stats widget + onglets)
+  HASH    : d5e8c3c
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 18:15
+  COMMIT  : feat: S4 — Module Production complet (ViewProduction + stats widget + onglets)
+  HASH    : 90820c5
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 18:42
+  COMMIT  : feat: S5 — Module Stock complet (ViewTransfert + ViewInventaire + StockStats + onglets)
+  HASH    : cc52b3d
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 18:53
+  COMMIT  : feat: S6 — Module CRM + Ventes complet
+  HASH    : 858ff5c
+  DETAIL  : - ViewVente : page de consultation avec actions Encaisser / Réglé patronne / Annuler / Imprimer reçu PDF
+- VenteStatsWidget : 4 KPIs (CA jour, CA mois, Impayés, Ventes à crédit)
+- ListVentes : onglets Toutes / Crédit / Partielles / Payées / Annulées + widget stats
+- ViewClient : fiche client avec résumé financier + 10 dernières ventes
+- ClientStatsWidget : 4 KPIs (Actifs, Avec impayés, Total impayés, Nouveaux mois)
+- ListClients : onglets Tous / Actifs / Avec impayés / Inactifs + widget stats
+- Client::ventesRecentes() : relation limitée à 10 ventes les plus récentes
+- Routes view enregistrées dans VenteResource et ClientResource
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 21/03/2026 a 19:07
+  COMMIT  : perf: optimisation DomPDF pour generation recu plus rapide (DPI 72, JS off)
+  HASH    : a0f897e
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 19:13
+  COMMIT  : refactor: bascule DomPDF vers mPDF pour generation recu PDF
+  HASH    : a684a7f
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 19:17
+  COMMIT  : fix: mPDF utilise storage/ au lieu de /tmp (open_basedir Hestia)
+  HASH    : 6a37914
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 19:25
+  COMMIT  : feat: S7 — Module Caisse avec ViewCaisse, onglets, stats widget et rapport PDF
+  HASH    : 84e90f7
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 19:38
+  COMMIT  : fix: recalcul totaux vente après sauvegarde des lignes Repeater
+  HASH    : 82ecdc5
+  DETAIL  : Filament 3 avec ->relationship() sauvegarde les lignes APRÈS le parent.
+mutateFormDataBeforeCreate/BeforeSave ne peut donc pas calculer les totaux
+(les lignes n'existent pas encore en BDD à ce stade).
+
+- CreateVente : totaux + statut calculés dans afterCreate() depuis les lignes réelles
+- EditVente   : totaux + statut recalculés dans afterSave() via updateQuietly()
+- Correction du statut_paiement (PAYE/PARTIEL/CREDIT selon montant_recu vs montant_net)
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 21/03/2026 a 19:49
+  COMMIT  : feat(S7): ChargeResource — onglets + widget stats KPI
+  HASH    : 4197258
+  DETAIL  : - ListCharges: ajout getTabs() (Toutes / Aujourd'hui / Ce mois / Fixes / Variables)
+- ChargeStatsWidget: 4 KPI (dépenses mois, dépenses jour, top catégorie, nb charges)
+- Widget auto-découvert via discoverWidgets
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 21/03/2026 a 20:07
+  COMMIT  : refactor: trait WidgetVisibleParProfil — bypass super_admin dans canView()
+  HASH    : bdf631d
+  DETAIL  : Tous les widgets du dashboard utilisent désormais static::visiblePour([...])
+via le trait WidgetVisibleParProfil.
+
+Le super_admin bypass le filtre par profil → voit tous les widgets
+même sans profil métier assigné (utile en développement).
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 21/03/2026 a 20:11
+  COMMIT  : docs: SESSION_2026-03-21 — S7 + S9 terminés, dashboard KPI validé en prod
+  HASH    : f4de5b2
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 20:18
+  COMMIT  : feat(S8): modules complémentaires — Eau en sachet + Viande
+  HASH    : f95c775
+  DETAIL  : Eau en sachet :
+- ViewEauProduction : page de consultation avec action Modifier
+- EauStatsWidget : 4 KPI (production mois/jour, sachets, énergie kWh)
+- ListEauProductions : onglets Toutes / Aujourd'hui / Ce mois / Cette semaine
+- EauProductionResource : ajout route view + action Delete dans table
+
+Viande :
+- ViandeStatsWidget : CA mois, volume kg, marge brute (dashboard global)
+- ListVentes : onglet "Viande" filtrant les ventes contenant des produits viande
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 21/03/2026 a 20:21
+  COMMIT  : fix: supprimer $heading static dans ViandeStatsWidget (incompatible Filament VPS)
+  HASH    : 2cfe770
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 20:33
+  COMMIT  : docs: SESSION — S8 Eau + Viande terminés
+  HASH    : c72eef1
+  DETAIL  : 
+  --------------------------------
+  DATE    : 21/03/2026 a 20:39
+  COMMIT  : feat(S10): export/import complet — Productions, Paiements, Eau, Modèle clients
+  HASH    : e91963c
+  DETAIL  : Nouveaux exports Excel :
+- ProductionsExport : référence, date, lot, poulets, poids, rendement, statut
+- PaiementsExport : N° reçu, client, date, montant, mode, référence, encaissé par
+- EauProductionsExport : date, paquets, sachets, énergie, observations
+
+Boutons export ajoutés :
+- ListProductions : bouton Exporter + ExportableParDates
+- ListEauProductions : bouton Exporter + ExportableParDates
+- ListPaiements : bouton Exporter (remplace le CSV bulk action)
+
+Import clients :
+- ClientsImportTemplateExport : modèle Excel téléchargeable (en-têtes + 2 exemples)
+- Bouton "Modèle import" dans ListClients
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 21/03/2026 a 20:57
+  COMMIT  : test(S11): CaisseServiceTest — 11 tests cycle caisse + fix comparaisons Enum
+  HASH    : 24f4b2a
+  DETAIL  : - Ajout tests/Feature/CaisseServiceTest.php : 11 tests couvrant le
+  cycle complet de la caisse (ouvrir, solde, écart, versements,
+  clôturer, valider, blocages)
+- Fix CaisseService : comparaisons statut Enum→Enum (au lieu de
+  Enum→string) pour cloturer(), valider() et enregistrerVersement()
+- phpunit.xml : ajout DB_SOCKET pour connexion MAMP en tests locaux
+- Suite complète : 38 tests / 93 assertions — tous verts ✅
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 30/03/2026 a 00:10
+  COMMIT  : feat(S13): améliorations Production, Lots, Inventaire + corrections
+  HASH    : e868b17
+  DETAIL  : MODULE PRODUCTION :
+- Ajout quantite_unite sur production_lignes (migration)
+- quantite (kg) rendu nullable (migration)
+- Répartition des poulets : nb_effil_form, nb_pac_form (virtuels)
+- Bouton pré-remplissage automatique produits obtenus
+- Coût unitaire par prorata valeur marchande (plus égale par unité)
+- Rendement poids = poids_obtenus / poids_entrant (standard abattoir)
+
+MODULE LOTS :
+- Ajout poids_total_lot (migration + modèle)
+- Poids moyen par poulet calculé automatiquement
+- Coût qté utilisable + Coût PM dans section coûts
+- Auto-fill montant_facture avec coût qté utilisable
+
+MODULE INVENTAIRE :
+- Bouton "Charger tous les produits en stock" (pré-remplissage)
+- Écart coloré : rouge (manque) / bleu (excédent) / vert (conforme)
+- Section résumé après validation : pertes, gains, impact net FCFA
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 30/03/2026 a 00:33
+  COMMIT  : fix(inventaire): recalcul dynamique écart physique−théorique
+  HASH    : a06439c
+  DETAIL  : - Infolist : écart calculé dynamiquement (getStateUsing) au lieu de lire
+  la colonne DB qui pouvait être 0 si non mise à jour via reactive form
+- Résumé ajustements : idem pour pertes, gains, impact net, nb_avec_ecart
+- validerInventaire() : utilise le calcul dynamique pour la vérification
+  des justifications et le passage des écarts au StockService
+- mutateFormDataBeforeSave/BeforeCreate : recalcule et persiste l'écart
+  correct avant chaque sauvegarde
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 30/03/2026 a 00:40
+  COMMIT  : feat: commande artisan chapchap:reset-donnees
+  HASH    : b37aaeb
+  DETAIL  : Vide les 15 tables transactionnelles (lots, productions, stock, ventes,
+caisse, inventaires…) en respectant l'ordre des FK, tout en conservant
+les référentiels (produits, emplacements, fournisseurs, utilisateurs, rôles).
+
+Usage : php artisan chapchap:reset-donnees --force
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  --------------------------------
+  DATE    : 30/03/2026 a 00:45
+  COMMIT  : docs: SESSION_2026-03-30 — déploiement VPS + fix inventaire écarts + reset DB prod
+  HASH    : ce41f73
+  DETAIL  : 
+  --------------------------------
+
+--------------------------------------------------
+  4. VERSIONS ET JALONS OFFICIELS
+--------------------------------------------------
+
+  Aucun tag Git trouve -- pas de versions officielles taggees
+
+--------------------------------------------------
+  5. ARCHITECTURE ET STRUCTURE TECHNIQUE
+--------------------------------------------------
+
+Arborescence principale :
+  .
+  ./.DS_Store
+  ./.claude
+  ./.editorconfig
+  ./.env
+  ./.env.example
+  ./.env.production.example
+  ./.git
+  ./.gitattributes
+  ./.gitignore
+  ./.phpunit.result.cache
+  ./CLAUDE.md
+  ./HISTOIRE_PROJET.txt
+  ./README.md
+  ./SESSION_2026-03-21.txt
+  ./SESSION_2026-03-29.txt
+  ./SESSION_HANDOFF_2026-03-29.md
+  ./app
+  ./app/Console
+  ./app/Console/Commands
+  ./app/Enums
+  ./app/Enums/Canal.php
+  ./app/Enums/CategorieProduit.php
+  ./app/Enums/ModePaiement.php
+  ./app/Enums/Profil.php
+  ./app/Enums/StatutCaisse.php
+  ./app/Enums/StatutFacture.php
+  ./app/Enums/StatutInventaire.php
+  ./app/Enums/StatutPaiement.php
+  ./app/Enums/StatutProduction.php
+  ./app/Enums/StatutTransfert.php
+  ./app/Enums/TypeCharge.php
+  ./app/Enums/TypeClient.php
+  ./app/Enums/TypeEmplacement.php
+  ./app/Enums/TypeMouvement.php
+  ./app/Exports
+  ./app/Exports/CaissesExport.php
+  ./app/Exports/ChargesExport.php
+  ./app/Exports/ClientsExport.php
+  ./app/Exports/ClientsImportTemplateExport.php
+  ./app/Exports/EauProductionsExport.php
+  ./app/Exports/LotsExport.php
+  ./app/Exports/PaiementsExport.php
+  ./app/Exports/ProductionsExport.php
+  ./app/Exports/StockExport.php
+  ./app/Exports/VentesExport.php
+  ./app/Filament
+  ./app/Filament/Pages
+  ./app/Filament/Resources
+  ./app/Filament/Widgets
+  ./app/Http
+  ./app/Http/Controllers
+  ./app/Imports
+  ./app/Imports/ClientsImport.php
+  ./app/Listeners
+  ./app/Listeners/LogSuccessfulLogin.php
+  ./app/Listeners/LogSuccessfulLogout.php
+  ./app/Models
+  ./app/Models/Caisse.php
+  ./app/Models/CategorieCharge.php
+  ./app/Models/Charge.php
+  ./app/Models/Client.php
+  ./app/Models/EauProduction.php
+  ./app/Models/Emplacement.php
+  ./app/Models/Fournisseur.php
+  ./app/Models/GrilleRendement.php
+  ./app/Models/Inventaire.php
+  ./app/Models/InventaireLigne.php
+  ./app/Models/JournalAudit.php
+  ./app/Models/Lot.php
+  ./app/Models/MouvementStock.php
+  ./app/Models/Paiement.php
+  ./app/Models/Production.php
+  ./app/Models/ProductionLigne.php
+  ./app/Models/Produit.php
+  ./app/Models/StockEmplacement.php
+  ./app/Models/Transfert.php
+  ./app/Models/TransfertLigne.php
+  ./app/Models/User.php
+  ./app/Models/Vente.php
+
+Fichiers de configuration cles :
+  [TROUVE] .env.example
+    APP_NAME=Laravel
+    APP_ENV=local
+    APP_KEY=
+    APP_DEBUG=true
+    APP_TIMEZONE=UTC
+    APP_URL=http://localhost
+    
+    APP_LOCALE=en
+    APP_FALLBACK_LOCALE=en
+    APP_FAKER_LOCALE=en_US
+    
+    APP_MAINTENANCE_DRIVER=file
+    # APP_MAINTENANCE_STORE=database
+    
+    PHP_CLI_SERVER_WORKERS=4
+    
+    BCRYPT_ROUNDS=12
+    
+    LOG_CHANNEL=stack
+    LOG_STACK=single
+    LOG_DEPRECATIONS_CHANNEL=null
+    LOG_LEVEL=debug
+    
+    DB_CONNECTION=sqlite
+    # DB_HOST=127.0.0.1
+
+  [TROUVE] config/app.php
+    <?php
+    
+    return [
+    
+        /*
+        |--------------------------------------------------------------------------
+        | Application Name
+        |--------------------------------------------------------------------------
+        |
+        | This value is the name of your application, which will be used when the
+        | framework needs to place the application's name in a notification or
+        | other UI elements where an application name needs to be displayed.
+        |
+        */
+    
+        'name' => env('APP_NAME', 'Laravel'),
+    
+        /*
+        |--------------------------------------------------------------------------
+        | Application Environment
+        |--------------------------------------------------------------------------
+        |
+        | This value determines the "environment" your application is currently
+        | running in. This may determine how you prefer to configure various
+        | services the application utilizes. Set this in your ".env" file.
+
+  [TROUVE] config/database.php
+    <?php
+    
+    use Illuminate\Support\Str;
+    
+    return [
+    
+        /*
+        |--------------------------------------------------------------------------
+        | Default Database Connection Name
+        |--------------------------------------------------------------------------
+        |
+        | Here you may specify which of the database connections below you wish
+        | to use as your default connection for database operations. This is
+        | the connection which will be utilized unless another connection
+        | is explicitly specified when you execute a query / statement.
+        |
+        */
+    
+        'default' => env('DB_CONNECTION', 'sqlite'),
+    
+        /*
+        |--------------------------------------------------------------------------
+        | Database Connections
+        |--------------------------------------------------------------------------
+        |
+
+  [TROUVE] vite.config.js
+    import { defineConfig } from 'vite';
+    import laravel from 'laravel-vite-plugin';
+    
+    export default defineConfig({
+        plugins: [
+            laravel({
+                input: ['resources/css/app.css', 'resources/js/app.js'],
+                refresh: true,
+            }),
+        ],
+    });
+
+
+Modeles / entites metier :
+  - ./app/Models/Caisse.php
+  - ./app/Models/CategorieCharge.php
+  - ./app/Models/Charge.php
+  - ./app/Models/Client.php
+  - ./app/Models/EauProduction.php
+  - ./app/Models/Emplacement.php
+  - ./app/Models/Fournisseur.php
+  - ./app/Models/GrilleRendement.php
+  - ./app/Models/Inventaire.php
+  - ./app/Models/InventaireLigne.php
+  - ./app/Models/JournalAudit.php
+  - ./app/Models/Lot.php
+  - ./app/Models/MouvementStock.php
+  - ./app/Models/Paiement.php
+  - ./app/Models/Production.php
+  - ./app/Models/ProductionLigne.php
+  - ./app/Models/Produit.php
+  - ./app/Models/StockEmplacement.php
+  - ./app/Models/Transfert.php
+  - ./app/Models/TransfertLigne.php
+  - ./app/Models/User.php
+  - ./app/Models/Vente.php
+  - ./app/Models/VenteLigne.php
+
+Migrations (ordre chronologique) :
+  - ./database/migrations/0001_01_01_000000_create_users_table.php
+  - ./database/migrations/0001_01_01_000001_create_cache_table.php
+  - ./database/migrations/0001_01_01_000002_create_jobs_table.php
+  - ./database/migrations/2026_02_19_195138_create_permission_tables.php
+  - ./database/migrations/2026_02_19_200001_create_emplacements_table.php
+  - ./database/migrations/2026_02_19_200002_alter_users_add_chapchap_columns.php
+  - ./database/migrations/2026_02_19_200003_create_fournisseurs_table.php
+  - ./database/migrations/2026_02_19_200004_create_produits_table.php
+  - ./database/migrations/2026_02_19_200005_create_categories_charges_table.php
+  - ./database/migrations/2026_02_19_200006_create_lots_table.php
+  - ./database/migrations/2026_02_19_200007_create_productions_table.php
+  - ./database/migrations/2026_02_19_200008_create_production_lignes_table.php
+  - ./database/migrations/2026_02_19_200009_create_stock_emplacements_table.php
+  - ./database/migrations/2026_02_19_200010_create_transferts_table.php
+  - ./database/migrations/2026_02_19_200011_create_transfert_lignes_table.php
+  - ./database/migrations/2026_02_19_200012_create_clients_table.php
+  - ./database/migrations/2026_02_19_200013_create_ventes_table.php
+  - ./database/migrations/2026_02_19_200014_create_vente_lignes_table.php
+  - ./database/migrations/2026_02_19_200015_create_paiements_table.php
+  - ./database/migrations/2026_02_19_200016_create_mouvements_stock_table.php
+  - ./database/migrations/2026_02_19_200017_create_caisses_table.php
+  - ./database/migrations/2026_02_19_200018_create_charges_table.php
+  - ./database/migrations/2026_02_19_200019_create_inventaires_table.php
+  - ./database/migrations/2026_02_19_200020_create_inventaire_lignes_table.php
+  - ./database/migrations/2026_02_19_200021_create_grilles_rendement_table.php
+  - ./database/migrations/2026_02_19_200022_create_journal_audit_table.php
+  - ./database/migrations/2026_02_19_200023_create_eau_productions_table.php
+  - ./database/migrations/2026_02_21_100001_add_performance_indexes.php
+  - ./database/migrations/2026_03_29_211328_add_quantite_unite_to_production_lignes.php
+  - ./database/migrations/2026_03_29_215554_make_quantite_nullable_in_production_lignes.php
+  - ./database/migrations/2026_03_29_234041_add_poids_total_to_lots_table.php
+
+Routes (si Laravel) :
+  [web.php]
+  Route::get('/', function () {
+  Route::get('/admin/ventes/{vente}/recu-pdf', function (Vente $vente) {
+
+--------------------------------------------------
+  6. DOCUMENTATION INTERNE
+--------------------------------------------------
+
+[FICHIER : README.md]
+---
+  <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+  
+  <p align="center">
+  <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  </p>
+  
+  ## About Laravel
+  
+  Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+  
+  - [Simple, fast routing engine](https://laravel.com/docs/routing).
+  - [Powerful dependency injection container](https://laravel.com/docs/container).
+  - Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+  - Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+  - Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+  - [Robust background job processing](https://laravel.com/docs/queues).
+  - [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+  
+  Laravel is accessible, powerful, and provides tools required for large, robust applications.
+  
+  ## Learning Laravel
+  
+  Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+  
+  You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+  
+  If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+  
+  ## Laravel Sponsors
+  
+  We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+  
+  ### Premium Partners
+  
+  - **[Vehikl](https://vehikl.com/)**
+  - **[Tighten Co.](https://tighten.co)**
+  - **[WebReinvent](https://webreinvent.com/)**
+  - **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+  - **[64 Robots](https://64robots.com)**
+  - **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+  - **[Cyber-Duck](https://cyber-duck.co.uk)**
+  - **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+  - **[Jump24](https://jump24.co.uk)**
+  - **[Redberry](https://redberry.international/laravel/)**
+  - **[Active Logic](https://activelogic.com)**
+  - **[byte5](https://byte5.de)**
+  - **[OP.GG](https://op.gg)**
+  
+  ## Contributing
+  
+  Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+  
+  ## Code of Conduct
+  
+  In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+  
+  ## Security Vulnerabilities
+  
+  If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+  
+  ## License
+  
+  The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+[FICHIER : CLAUDE.md]
+---
+  # 🚀 PROMPT SYSTÈME — PROJET CHAPCHAP
+  ## Application Web de Gestion Intégrée (Boucherie / Transformation de volailles)
+  
+  ---
+  
+  ## 🎯 IDENTITÉ & RÔLE
+  
+  Tu es l'architecte-développeur principal et **mentor pédagogique** du projet **CHAPCHAP**, une application web de gestion intégrée pour une boucherie spécialisée dans l'abattage, la découpe, le conditionnement et la vente de volailles en Côte d'Ivoire (Abidjan).
+  
+  Tu travailles avec un développeur PHP qui découvre Laravel pour la première fois. Tu dois :
+  - Produire du **code production-ready**, jamais de pseudo-code
+  - **Expliquer chaque concept** Laravel lors de sa première utilisation (migration, model, relation, observer, service, policy, etc.)
+  - Respecter strictement le cahier des charges validé par la direction et le dossier d'analyse technique
+  
+  ---
+  
+  ## 🎓 MODE MENTOR (PÉDAGOGIE)
+  
+  **IMPORTANT** : Le développeur est compétent en PHP mais c'est son premier projet Laravel/Filament. À chaque étape :
+  
+  1. **Avant de coder** : Explique brièvement POURQUOI on crée ce fichier et QUEL concept Laravel il utilise (2-3 phrases max, pas un cours magistral)
+  2. **Dans le code** : Ajoute des commentaires en français expliquant les parties non évidentes
+  3. **Après le code** : Résume ce qu'on vient de faire et quel est le lien avec le reste de l'application
+  4. **Commandes Artisan** : Explique chaque commande avant de la lancer
+  5. **Erreurs** : Si une erreur survient, explique pourquoi elle se produit et comment la résoudre
+  
+  ### Exemple de réponse attendue :
+  ```
+  📘 **Concept : Migration**
+  Une migration est un fichier PHP qui décrit la structure d'une table.
+  C'est comme un plan de construction versionné — on peut la rejouer, 
+  l'annuler, et toute l'équipe a la même BDD.
+  
+  Je crée la migration pour la table `lots` :
+  [... code ...]
+  
+  ✅ **Résumé** : On vient de créer la table `lots` avec 24 colonnes.
+  La colonne `fournisseur_id` crée une relation avec la table `fournisseurs`
+  (un lot APPARTIENT À un fournisseur). 
+  Prochaine étape : créer le Model Lot.php pour manipuler cette table en PHP.
+  ```
+  
+  ### Progression pédagogique :
+  - **S1-S2** : Explications détaillées (concepts de base : migration, model, enum, relation, seeder)
+  - **S3-S4** : Explications moyennes (concepts intermédiaires : Filament Resource, Observer, Service)
+  - **S5+** : Explications légères (le développeur maîtrise les bases, on se concentre sur le métier)
+  
+  ---
+  
+  ## 📋 CONTEXTE MÉTIER
+  
+  **CHAPCHAP** gère :
+  - L'achat de poulets vivants et œufs (fournisseur principal : OVECH RANCH)
+  - L'abattage et la découpe en produits finis (escalopes, cuisses, ailes, gésiers, carcasses, etc.)
+  - Le stockage en chambre froide (site principal) et au point de vente (Belleville)
+  - La vente multi-canaux : boutique (sur place), commerciaux terrain (B2B), livraison
+  - Les clients B2B : SITA, Casino Prima, Hyper Hayat, NORAL, PROSUMA, restaurants
+  - La gestion de caisse journalière avec versements (espèces, Wave, MTN Money, chèque)
+  - Les charges/dépenses catégorisées
+  - Une activité complémentaire : eau en sachet et viande
+  
+  **Monnaie** : FCFA (XOF) — pas de multi-devises.
+  **Emplacements** : Site principal (abattoir + chambre froide) et Belleville (point de vente).
+  **Commerciaux** : Hector (principal + caisse), Niamke, Jessy, Yves, Evelyne.
+  
+  ---
+  
+  ## 🛠️ STACK TECHNOLOGIQUE (VALIDÉ)
+  
+  | Couche | Technologie | Version |
+  |--------|-------------|---------|
+  | **Framework** | Laravel | 11+ |
+  | **Frontend interactif** | Livewire | 3 |
+  | **Admin Panel / Dashboard** | Filament | 3 |
+  | **Base de données** | MySQL | 8+ (ou MariaDB 10.6+) |
+  | **Auth / RBAC** | Laravel Sanctum + Spatie Permission | Latest |
+  | **PDF** | DomPDF (barryvdh/laravel-dompdf) | Latest |
+  | **Excel** | Maatwebsite Laravel Excel | Latest |
+  | **Permissions Filament** | Filament Shield (BezhanSalleh) | Latest |
+  | **PHP** | PHP | 8.2+ |
+
+[DOC : ./SESSION_HANDOFF_2026-03-29.md]
+  # CHAPCHAP — Handoff Session du 2026-03-29
+  
+  > Lis ce document au début de ta prochaine session pour reprendre exactement là où on s'est arrêtés.
+  
+  ---
+  
+  ## 1. Environnement de travail
+  
+  | Élément | Valeur |
+  |---------|--------|
+  | **Projet** | `/Applications/MAMP/htdocs/chapchap/` |
+  | **Serveur dev** | `php artisan serve` → http://localhost:8000/admin/login |
+  | **Connexion admin** | `patrick.tetchi@cpf-afrique.com` / `password` |
+  | **MySQL** | MAMP Pro, socket `/Applications/MAMP/tmp/mysql/mysql.sock` |
+  | **DB locale** | `chapchap` (données de prod importées ce jour) |
+  | **phpMyAdmin** | http://localhost:8888/phpMyAdmin6/ (root/root) |
+  
+  Pour lancer le serveur :
+  ```bash
+  cd /Applications/MAMP/htdocs/chapchap && php artisan serve
+  ```
+  
+  ---
+  
+  ## 2. Ce qui a été fait dans cette session
+  
+  ### 2.1 Migration XAMPP → MAMP Pro ✅
+  - Projet copié de `/Applications/XAMPP/xamppfiles/htdocs/chapchap/` → `/Applications/MAMP/htdocs/chapchap/`
+  - BDD exportée depuis XAMPP (MariaDB 10.4) et importée dans MySQL 8.0 MAMP
+  - `.env` mis à jour avec `DB_SOCKET` (MAMP Pro tourne en `skip_networking=ON`, TCP désactivé)
+  - XAMPP conservé désactivé comme backup
+  
+  ### 2.2 Amélioration du module Production ✅ (codée, non encore testée ni déployée)
+  
+  **Contexte** : Dans le formulaire de production, section "Produits obtenus", l'ancien champ unique "Quantité (kg ou unités)" était ambigu. On l'a remplacé par deux champs distincts.
+  
+  **Fichiers modifiés :**
+  
+  #### `database/migrations/2026_03_29_211328_add_quantite_unite_to_production_lignes.php`
+  Nouvelle migration qui ajoute la colonne `quantite_unite` (integer, nullable) à la table `production_lignes`.
+  - ✅ Migration appliquée en local
+  
+  #### `app/Models/ProductionLigne.php`
+  - Ajout de `quantite_unite` dans `$fillable`
+  - Ajout du cast `'quantite_unite' => 'integer'`
+  
+  #### `app/Filament/Resources/ProductionResource.php`
+  Deux changements :
+  
+  **Dans `form()` — Repeater "Produits obtenus"** :
+
+[DOC : ./docs/guides/GUIDE_DEPLOIEMENT.md]
+  # CHAPCHAP — Guide de Deploiement Serveur
+  
+  ## Pre-requis serveur
+  
+  | Composant | Version minimum |
+  |-----------|----------------|
+  | PHP | 8.2+ avec extensions : mbstring, xml, curl, mysql, zip, gd, intl, bcmath |
+  | MySQL | 8.0+ (ou MariaDB 10.6+) |
+  | Composer | 2.x |
+  | Git | 2.x |
+  | Nginx ou Apache | Version recente |
+  | Node.js | 18+ (pour compiler les assets si besoin) |
+  
+  ### Extensions PHP requises
+  
+  ```bash
+  sudo apt install php8.2-fpm php8.2-mysql php8.2-mbstring php8.2-xml \
+      php8.2-curl php8.2-zip php8.2-gd php8.2-intl php8.2-bcmath \
+      php8.2-readline php8.2-opcache
+  ```
+  
+  ---
+  
+  ## Option 1 : Deploiement avec Laravel Forge (recommande)
+  
+  Laravel Forge automatise la configuration du serveur.
+  
+  1. Creer un compte sur [forge.laravel.com](https://forge.laravel.com)
+  2. Connecter votre VPS (DigitalOcean, Hetzner, etc.)
+  3. Creer un nouveau site avec :
+     - **Repository** : votre repo Git
+     - **Branch** : main
+     - **PHP** : 8.2+
+     - **Base de donnees** : MySQL 8
+  4. Dans les parametres du site :
+     - **Environment** : copier le contenu de `.env.production` et remplir les valeurs
+     - **Deploy script** : utiliser le contenu de `deploy.sh`
+  5. Configurer le **Scheduler** :
+     - Forge ajoute automatiquement la crontab si vous activez le scheduler
+  6. Activer **SSL** (Let's Encrypt) via Forge
+  
+  ---
+  
+  ## Option 2 : Deploiement manuel sur VPS
+  
+  ### 1. Preparer le serveur
+  
+  ```bash
+  # Mettre a jour le systeme
+  sudo apt update && sudo apt upgrade -y
+
+[DOC : ./docs/guides/GUIDE_DEPLOIEMENT_HESTIA.md]
+  # CHAPCHAP — Guide de Deploiement sur VPS Hestia
+  
+  ## Ton serveur actuel
+  
+  | Composant | Version/Detail |
+  |-----------|---------------|
+  | **OS** | Ubuntu 24.04 (x86_64) |
+  | **Panel** | Hestia Control Panel v1.9.4 |
+  | **Web** | Nginx (reverse proxy) + Apache2 |
+  | **PHP** | 8.3-fpm |
+  | **BDD** | MariaDB |
+  | **Mail** | exim4 + dovecot |
+  | **Securite** | fail2ban + iptables |
+  | **FTP** | vsftpd |
+  
+  ---
+  
+  ## ETAPE 1 : Optimiser la RAM du serveur (recommande)
+  
+  ClamAV consomme ~1400 Mo de RAM. Si tu n'utilises pas le scan antivirus des emails,
+  desactive-le pour liberer de la memoire :
+  
+  ```bash
+  # Se connecter en SSH
+  ssh root@vps114082.serveur-vps.net
+  
+  # Verifier la RAM disponible
+  free -h
+  
+  # Desactiver ClamAV si non necessaire (libere ~1.4 Go)
+  sudo systemctl stop clamav-daemon clamav-freshclam
+  sudo systemctl disable clamav-daemon clamav-freshclam
+  
+  # Desactiver SpamAssassin si non necessaire (libere ~380 Mo)
+  sudo systemctl stop spamassassin
+  sudo systemctl disable spamassassin
+  
+  # Verifier la RAM apres
+  free -h
+  ```
+  
+  > **Resultat attendu** : ~1.8 Go de RAM liberee, ce qui est confortable pour Laravel + MariaDB.
+  
+  ---
+  
+  ## ETAPE 2 : Installer les extensions PHP manquantes
+  
+  PHP 8.3 est deja installe, mais il faut verifier que toutes les extensions
+  requises par Laravel 11 et Filament 3 sont presentes.
+  
+
+[DOC : ./docs/guides/GUIDE_UTILISATEUR.md]
+  # CHAPCHAP — Guide Utilisateur
+  
+  ## Accès a l'application
+  
+  - **URL** : `https://chapchap.votredomaine.ci/admin`
+  - **Navigateur recommande** : Chrome, Firefox, Safari (versions recentes)
+  - **Mobile** : L'application fonctionne sur smartphone (interface responsive)
+  
+  ---
+  
+  ## Connexion
+  
+  1. Ouvrir l'URL de l'application
+  2. Saisir votre **email** et **mot de passe**
+  3. Cliquer sur **Se connecter**
+  
+  > En cas d'oubli de mot de passe, contacter l'administrateur.
+  
+  ---
+  
+  ## Tableau de bord
+  
+  Apres connexion, vous arrivez sur le tableau de bord. Les widgets affiches dependent de votre profil :
+  
+  | Profil | Widgets visibles |
+  |--------|-----------------|
+  | Gerant | CA jour/semaine/mois, Evolution CA, Top clients, Top produits, Impayes, Tresorerie, Production, Commerciaux, Stock, Alertes |
+  | Resp. Operations | Tous les widgets |
+  | Gestionnaire Stock | Stock, Alertes stock |
+  | Agent Production | Production (poulets traites, rendement, pertes) |
+  | Commercial | Top clients, Impayes, Performance commerciaux |
+  
+  ---
+  
+  ## Module Lots / Achats
+  
+  ### Creer un lot
+  
+  1. Menu **Stock > Lots**
+  2. Cliquer **Nouveau lot**
+  3. Remplir :
+     - **Fournisseur** (ex: OVECH RANCH)
+     - **Type** : poulet ou oeuf
+     - **Date de reception**
+     - **Quantite recue** : nombre de poulets/oeufs
+     - **Prix unitaire** en FCFA
+     - **Cout transport** et **Autres couts** (optionnels)
+     - **Poulets morts (PM)** et **Refuses (IR)** si applicable
+  4. Cliquer **Creer**
+  
+
+[SESSION : ./SESSION_2026-03-21.txt]
+  ==============================================================
+    CHAPCHAP — Récapitulatif de session du 21 mars 2026
+  ==============================================================
+  
+  ## DÉPLOIEMENT EN PRODUCTION (Phases 4 à 6)
+  --------------------------------------------------------------
+  
+  ### Infrastructure serveur
+  - VPS Hestia : vps114082.serveur-vps.net
+  - OS : Ubuntu 22.04
+  - PHP : 8.3.30
+  - MariaDB / MySQL : actif
+  - Node.js : 20 LTS
+  
+  ### Domaine & SSL
+  - URL production : https://app.chapchap-ci.com/admin
+  - SSL Let's Encrypt : activé et valide
+  
+  ### Problèmes résolus durant le déploiement
+  
+  1. open_basedir restriction (HTTP 500)
+     - Fix : ajout de /home/Tetchi/web/app.chapchap-ci.com/project
+       dans /etc/php/8.3/fpm/pool.d/app.chapchap-ci.com.conf
+  
+  2. RolePermissionSeeder échoue (rôle 'gerant' inexistant)
+     - Fix : création manuelle via tinker + shield:super-admin --user=1
+  
+  3. git pull "dubious ownership"
+     - Fix : git config --global --add safe.directory [path]
+  
+  4. Dashboard vide en production
+     - Cause : profil utilisateur non assigné sur le compte production
+     - Fix : assigner le profil "Gérant" via Utilisateurs → Modifier → Sauvegarder
+     - Prévention : trait WidgetVisibleParProfil — les super_admin voient
+       tous les widgets même sans profil métier assigné (commit bdf631d)
+  
+  ### Services en production
+  - Cron Laravel : actif (toutes les minutes)
+  - Queue Worker : service systemd chapchap-queue (actif)
+  - Script deploy.sh : /home/Tetchi/web/app.chapchap-ci.com/project/deploy.sh
+  
+  ### Accès production
+  - URL     : https://app.chapchap-ci.com/admin
+  - Email   : patrick.tetchi@cpf-afrique.com
+  - Rôle    : super_admin (223 permissions)
+  - Profil  : Gérant (obligatoire pour les widgets dashboard)
+  
+  ==============================================================
+  
+  ## MODULE LOTS — S3 ✅
+  --------------------------------------------------------------
+  - ViewLot : infolist + "Enregistrer un règlement"
+  - ListLots : onglets Tous / Non réglées / Partielles / Réglées + LotStatsWidget
+  - Commit : d5e8c3c
+  
+  ==============================================================
+  
+  ## MODULE PRODUCTION — S4 ✅
+  --------------------------------------------------------------
+  - ViewProduction : infolist + Valider / Annuler → génère stock auto
+
+[SESSION : ./SESSION_2026-03-29.txt]
+  ================================================================================
+    SESSION DE TRAVAIL — PROJET CHAPCHAP
+    Date : 29 Mars 2026
+    Sujet : Migration complète XAMPP → MAMP Pro
+  ================================================================================
+  
+  
+  1. OBJECTIF DE LA SESSION
+  --------------------------------------------------------------------------------
+  Migrer le projet Laravel CHAPCHAP et sa base de données de XAMPP vers MAMP Pro
+  pour bénéficier d'un environnement de développement plus moderne et mieux géré.
+  
+  
+  2. ÉTAT AVANT LA MIGRATION (XAMPP)
+  --------------------------------------------------------------------------------
+  - Projet           : /Applications/XAMPP/xamppfiles/htdocs/chapchap/
+  - Base de données  : MariaDB 10.4.28, port 3306, root sans mot de passe
+  - PHP              : 8.4.8 (Homebrew, /usr/local/bin/php)
+  - Apache           : port 80, vhost chapchap.local
+  - Accès app        : http://localhost:8000 (via php artisan serve)
+  
+  
+  3. ÉTAT APRÈS LA MIGRATION (MAMP Pro)
+  --------------------------------------------------------------------------------
+  - Projet           : /Applications/MAMP/htdocs/chapchap/
+  - Base de données  : MySQL 8.0.44, socket uniquement (skip_networking=ON)
+    - Socket         : /Applications/MAMP/tmp/mysql/mysql.sock
+    - Port config    : 8889 (TCP désactivé, connexion via socket)
+    - User / Pass    : root / root
+  - PHP              : 8.4.8 (Homebrew, inchangé)
+  - Apache MAMP      : port 8888 (phpMyAdmin accessible)
+  - Accès app        : http://localhost:8000 (via php artisan serve)
+  - XAMPP            : conservé désactivé comme backup
+  
+  
+  4. ÉTAPES RÉALISÉES
+  --------------------------------------------------------------------------------
+  
+    [1] Arrêt de XAMPP
+        - Apache XAMPP arrêté via le XAMPP Manager
+        - MySQL XAMPP arrêté via : mysqladmin -u root shutdown
+  
+    [2] Export de la base de données depuis XAMPP
+        Commande utilisée :
+          /Applications/XAMPP/xamppfiles/bin/mysqldump \
+            -u root --default-character-set=utf8mb4 \
+            --single-transaction --routines --triggers \
+            chapchap > /tmp/chapchap_backup.sql
+        Résultat : fichier de 140K, export complet (36 tables)
+  
+    [3] Copie du projet vers MAMP
+        Commande :
+          cp -R /Applications/XAMPP/xamppfiles/htdocs/chapchap \
+                /Applications/MAMP/htdocs/chapchap
+        Résultat : 142M copiés avec succès
+  
+    [4] Démarrage de MAMP Pro
+        - MAMP Pro lancé via l'application
+        - MySQL 8.0 sélectionné, PHP 8.4.17 configuré
+        - Apache sur port 8888, MySQL sur port 8889 (socket only)
+
+[SESSION : ./SESSION_HANDOFF_2026-03-29.md]
+  # CHAPCHAP — Handoff Session du 2026-03-29
+  
+  > Lis ce document au début de ta prochaine session pour reprendre exactement là où on s'est arrêtés.
+  
+  ---
+  
+  ## 1. Environnement de travail
+  
+  | Élément | Valeur |
+  |---------|--------|
+  | **Projet** | `/Applications/MAMP/htdocs/chapchap/` |
+  | **Serveur dev** | `php artisan serve` → http://localhost:8000/admin/login |
+  | **Connexion admin** | `patrick.tetchi@cpf-afrique.com` / `password` |
+  | **MySQL** | MAMP Pro, socket `/Applications/MAMP/tmp/mysql/mysql.sock` |
+  | **DB locale** | `chapchap` (données de prod importées ce jour) |
+  | **phpMyAdmin** | http://localhost:8888/phpMyAdmin6/ (root/root) |
+  
+  Pour lancer le serveur :
+  ```bash
+  cd /Applications/MAMP/htdocs/chapchap && php artisan serve
+  ```
+  
+  ---
+  
+  ## 2. Ce qui a été fait dans cette session
+  
+  ### 2.1 Migration XAMPP → MAMP Pro ✅
+  - Projet copié de `/Applications/XAMPP/xamppfiles/htdocs/chapchap/` → `/Applications/MAMP/htdocs/chapchap/`
+  - BDD exportée depuis XAMPP (MariaDB 10.4) et importée dans MySQL 8.0 MAMP
+  - `.env` mis à jour avec `DB_SOCKET` (MAMP Pro tourne en `skip_networking=ON`, TCP désactivé)
+  - XAMPP conservé désactivé comme backup
+  
+  ### 2.2 Amélioration du module Production ✅ (codée, non encore testée ni déployée)
+  
+  **Contexte** : Dans le formulaire de production, section "Produits obtenus", l'ancien champ unique "Quantité (kg ou unités)" était ambigu. On l'a remplacé par deux champs distincts.
+  
+  **Fichiers modifiés :**
+  
+  #### `database/migrations/2026_03_29_211328_add_quantite_unite_to_production_lignes.php`
+  Nouvelle migration qui ajoute la colonne `quantite_unite` (integer, nullable) à la table `production_lignes`.
+  - ✅ Migration appliquée en local
+  
+  #### `app/Models/ProductionLigne.php`
+  - Ajout de `quantite_unite` dans `$fillable`
+  - Ajout du cast `'quantite_unite' => 'integer'`
+  
+  #### `app/Filament/Resources/ProductionResource.php`
+  Deux changements :
+  
+  **Dans `form()` — Repeater "Produits obtenus"** :
+  - Repeater passé de 2 à 3 colonnes
+  - Champ `quantite` renommé "Quantité (kg)" avec suffix `kg`, step `0.001`
+  - Nouveau champ `quantite_unite` "Quantité (unités)", entier, nullable
+  
+  **Dans `infolist()` — Vue détail** :
+  - RepeatableEntry passé de 4 à 5 colonnes
+  - Nouveau champ `quantite_unite` "Qté (unités)" ajouté avant "Qté (kg)"
+  
+  ### 2.3 Restauration de la DB de production en local ✅
+  - Fichier : `/Applications/XAMPP/xamppfiles/htdocs/chapchap/Tetchi_chapchap.sql` (export phpMyAdmin)
+
+[SESSION : ./docs/SESSION_2026-03-29.txt]
+  ================================================================================
+  CHAPCHAP — RÉCAPITULATIF SESSION DU 2026-03-29
+  ================================================================================
+  
+  ENVIRONNEMENT
+  ─────────────
+  - Projet    : /Applications/MAMP/htdocs/chapchap/
+  - Serveur   : php artisan serve → http://localhost:8000/admin
+  - DB locale : chapchap (données de prod réelles importées depuis XAMPP)
+  - MySQL     : MAMP Pro (socket /Applications/MAMP/tmp/mysql/mysql.sock)
+  - Laravel   : 12 / Filament 3 / PHP 8.4
+  
+  ================================================================================
+  1. REPRISE DU CONTEXTE — MIGRATION XAMPP → MAMP
+  ================================================================================
+  
+  - Le projet avait été développé sur XAMPP, puis migré vers MAMP Pro.
+  - BDD exportée depuis XAMPP (MariaDB 10.4) et importée dans MySQL 8.0 MAMP.
+  - Fichier handoff lu : SESSION_HANDOFF_2026-03-29.md
+  - État au début de session : module Production partiellement modifié (quantite_unite
+    ajouté, migration appliquée, mais non testée).
+  
+  ================================================================================
+  2. TESTS PHPUNIT — CONFIGURATION BASE DE DONNÉES DE TEST
+  ================================================================================
+  
+  PROBLÈME :
+    Les tests CaisseServiceTest échouaient avec :
+    SQLSTATE[HY000] [1049] Unknown database 'chapchap_test'
+  
+  CAUSE :
+    phpunit.xml ne configurait pas le socket MySQL (MAMP fonctionne via socket,
+    pas via TCP).
+  
+  SOLUTION :
+    Modification de phpunit.xml pour ajouter :
+      <env name="DB_HOST" value="localhost"/>
+      <env name="DB_PORT" value="8889"/>
+      <env name="DB_USERNAME" value="root"/>
+      <env name="DB_PASSWORD" value="root"/>
+      <env name="DB_SOCKET" value="/Applications/MAMP/tmp/mysql/mysql.sock"/>
+  
+    Création manuelle de la DB :
+      mysql -uroot -proot -S /Applications/MAMP/tmp/mysql/mysql.sock \
+        -e "CREATE DATABASE IF NOT EXISTS chapchap_test ..."
+  
+  FICHIER MODIFIÉ : phpunit.xml
+  
+  ================================================================================
+  3. RBAC / FILAMENT SHIELD — ÉTAT ACTUEL CONFIRMÉ
+  ================================================================================
+  
+  DISCUSSION :
+    L'utilisateur pensait que le RBAC n'était pas configuré.
+    Vérification avec : php artisan permission:show
+  
+  CONSTAT :
+    Le RBAC est déjà opérationnel avec 8 rôles configurés :
+      super_admin, gerant, resp_operations, gestionnaire_stock,
+      agent_production, commercial, point_de_vente, panel_user
+
+[SESSION : ./docs/SESSION_2026-03-30.txt]
+  ================================================================================
+  CHAPCHAP — RÉCAPITULATIF SESSION DU 2026-03-30
+  ================================================================================
+  
+  ENVIRONNEMENT
+  ─────────────
+  - Projet    : /Applications/MAMP/htdocs/chapchap/
+  - App prod  : https://app.chapchap-ci.com/admin
+  - VPS       : vps114082.serveur-vps.net / 192.162.69.224 (OVH Ubuntu 24.04)
+  - App path  : /home/Tetchi/web/app.chapchap-ci.com/project/
+  - DB locale : chapchap (MAMP Pro / MySQL socket)
+  - Laravel   : 12 / Filament 3 / PHP 8.4
+  
+  ================================================================================
+  1. DÉPLOIEMENT EN PRODUCTION — RÉSOLUTION PROBLÈME SSH
+  ================================================================================
+  
+  PROBLÈME :
+    SSH refusé depuis la machine locale.
+    Tentative avec mauvais utilisateur (patricktetchi au lieu de root).
+    Port 22 accessible via nc mais SSH répondait "Connection refused" depuis
+    les outils Claude (pas de clé SSH configurée côté Claude).
+  
+  SOLUTION :
+    Connexion via la console KVM OVH (panel manager.ovh.com → VPS → Console KVM).
+    Accès avec root + mot de passe root OVH.
+  
+  COMMANDES DÉPLOIEMENT EXÉCUTÉES SUR LE VPS :
+    cd /home/Tetchi/web/app.chapchap-ci.com/project/
+    git pull origin main
+    composer install --no-dev --optimize-autoloader
+    php artisan migrate --force
+    php artisan optimize
+  
+  RÉSULTAT :
+    33 objets git récupérés, 20 fichiers mis à jour.
+    3 migrations appliquées :
+      - add_quantite_unite_to_production_lignes      ✓
+      - make_quantite_nullable_in_production_lignes  ✓
+      - add_poids_total_to_lots_table                ✓
+    Config/routes/views/filament cachés.
+  
+  COMMIT DÉPLOYÉ : e868b17
+  
+  NOTE :
+    Pour les prochains déploiements, utiliser la console KVM OVH
+    (manager.ovh.com → VPS → Console KVM → login root).
+    GitHub Actions non encore configuré (reporté).
+  
+  ================================================================================
+  2. FIX MODULE INVENTAIRE — ÉCARTS INCORRECTS (= 0)
+  ================================================================================
+  
+  PROBLÈME CONSTATÉ EN PRODUCTION :
+    Tous les écarts affichaient 0,000 dans la vue détail (infolist),
+    même quand stock_physique ≠ stock_theorique.
+    Ex : Poulet effilé → Théorique 350 / Physique 400 → Écart affiché : 0,000
+  
+  CAUSE RACINE :
+    1. Le bouton "Charger tous les produits" initialise ecart = 0 dans le Repeater.
+
+
+--------------------------------------------------
+  7. ETAT ACTUEL -- OU EN EST LE PROJET
+--------------------------------------------------
+
+Derniere version stable : aucun tag
+
+Fichiers modifies non commites :
+  ?? HISTOIRE_PROJET.txt
+  ?? SESSION_2026-03-29.txt
+  ?? SESSION_HANDOFF_2026-03-29.md
+  ?? docs/droits_utilisateurs_chapchap.pdf
+  ?? docs/droits_utilisateurs_chapchap.xlsx
+  ?? docs/verify_user_permissions.sh
+
+Nouveaux fichiers non trackes :
+  [NOUVEAU] HISTOIRE_PROJET.txt
+  [NOUVEAU] SESSION_2026-03-29.txt
+  [NOUVEAU] SESSION_HANDOFF_2026-03-29.md
+  [NOUVEAU] docs/droits_utilisateurs_chapchap.pdf
+  [NOUVEAU] docs/droits_utilisateurs_chapchap.xlsx
+  [NOUVEAU] docs/verify_user_permissions.sh
+
+Diff resume (fichiers en cours) :
+
+--------------------------------------------------
+  8. ANALYSE D'ACTIVITE
+--------------------------------------------------
+
+Jours les plus actifs :
+  17 commits -- 21/03/2026
+  4 commits -- 30/03/2026
+  2 commits -- 13/03/2026
+  1 commits -- 19/02/2026
+
+Fichiers les plus modifies (coeur du projet) :
+    6 modifs -- SESSION_2026-03-21.txt
+    4 modifs -- routes/web.php
+    4 modifs -- app/Filament/Resources/InventaireResource.php
+    3 modifs -- phpunit.xml
+    3 modifs -- composer.lock
+    3 modifs -- composer.json
+    3 modifs -- app/Providers/AppServiceProvider.php
+    3 modifs -- app/Filament/Resources/VenteResource/Pages/ListVentes.php
+    3 modifs -- app/Filament/Resources/VenteResource/Pages/EditVente.php
+    3 modifs -- app/Filament/Resources/VenteResource.php
+    3 modifs -- app/Filament/Resources/ProductionResource/Pages/ListProductions.php
+    3 modifs -- app/Filament/Resources/ProductionResource.php
+    3 modifs -- app/Filament/Resources/LotResource.php
+    3 modifs -- app/Filament/Resources/EauProductionResource/Pages/ListEauProductions.php
+    3 modifs -- app/Filament/Resources/EauProductionResource.php
+
+Sessions de travail distinctes :
+  30/03/2026 | docs: SESSION_2026-03-30 — déploiement VPS + fix inventaire écarts + reset DB prod
+  21/03/2026 | test(S11): CaisseServiceTest — 11 tests cycle caisse + fix comparaisons Enum
+  13/03/2026 | refactor: reorganisation du projet + 4 nouveaux services métier
+  19/02/2026 | feat: setup initial projet CHAPCHAP - Phase S1
+
+--------------------------------------------------
+  9. SYNTHESE EXECUTIVE
+--------------------------------------------------
+
+  Projet       : chapchap
+  Genere le    : 30/03/2026 a 13:35
+  Commits      : 24
+  Versions     : 0
+  Branches     : 1
+  Fichiers src : 396
+  Non commites : 6 fichier(s)
+
+==================================================
+  FIN DU RAPPORT
+  Envoyer HISTOIRE_PROJET.txt a Claude
+==================================================

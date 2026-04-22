@@ -26,7 +26,7 @@ class TresorerieChart extends ChartWidget
 {
     use WidgetVisibleParProfil;
 
-    protected static ?string $heading = 'Trésorerie — 7 derniers jours';
+    protected static ?string $heading = 'Trésorerie : 7 derniers jours';
 
     protected static ?int $sort = 6;
 

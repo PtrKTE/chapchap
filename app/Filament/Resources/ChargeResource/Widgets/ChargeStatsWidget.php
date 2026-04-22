@@ -40,8 +40,8 @@ class ChargeStatsWidget extends StatsOverviewWidget
             ->orderByDesc('total')
             ->first();
 
-        $topNom     = $topCategorie?->categorie?->nom ?? '—';
-        $topMontant = $topCategorie ? number_format((float) $topCategorie->total, 0, ',', ' ') . ' FCFA' : '—';
+        $topNom     = $topCategorie?->categorie?->nom ?? '';
+        $topMontant = $topCategorie ? number_format((float) $topCategorie->total, 0, ',', ' ') . ' FCFA' : '';
 
         // Nombre de charges ce mois
         $nbMois = Charge::whereBetween('date_charge', [$debutMois, $finMois])->count();

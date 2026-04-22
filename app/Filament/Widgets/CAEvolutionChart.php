@@ -23,7 +23,7 @@ class CAEvolutionChart extends ChartWidget
 {
     use WidgetVisibleParProfil;
 
-    protected static ?string $heading = 'Evolution du CA — 30 derniers jours';
+    protected static ?string $heading = 'Evolution du CA : 30 derniers jours';
 
     protected static ?int $sort = -2;
 

@@ -96,7 +96,6 @@ class CategorieChargeResource extends Resource
                     ->label('Réf. mensuelle (FCFA)')
                     ->numeric(0)
                     ->suffix(' FCFA')
-                    ->placeholder('—'),
                 Tables\Columns\IconColumn::make('actif')
                     ->label('Actif')
                     ->boolean(),

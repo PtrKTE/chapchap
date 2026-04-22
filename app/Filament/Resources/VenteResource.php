@@ -84,7 +84,6 @@ class VenteResource extends Resource
                     Infolists\Components\TextEntry::make('commercial.name')
                         ->label('Commercial')
                         ->icon('heroicon-o-briefcase')
-                        ->placeholder('—'),
                 ])->columns(3),
 
             // Lignes de produits vendus
@@ -159,12 +158,10 @@ class VenteResource extends Resource
                     Infolists\Components\TextEntry::make('mode_paiement')
                         ->label('Mode de paiement')
                         ->badge()
-                        ->placeholder('—'),
 
                     Infolists\Components\TextEntry::make('date_reglement_complet')
                         ->label('Date règlement complet')
                         ->date('d/m/Y')
-                        ->placeholder('—'),
                 ])->columns(4),
 
             // Observations et infos complémentaires
@@ -191,7 +188,6 @@ class VenteResource extends Resource
 
                     Infolists\Components\TextEntry::make('motif_annulation')
                         ->label('Motif d\'annulation')
-                        ->placeholder('—')
                         ->visible(fn($record) => $record->annulee),
                 ])->columns(3)
                 ->collapsible(),
@@ -419,7 +415,7 @@ class VenteResource extends Resource
                             $recu = (float) ($get('montant_recu') ?? 0);
 
                             if ($net <= 0) {
-                                return '—';
+                                return '';
                             }
                             if ($recu <= 0) {
                                 return 'Crédit total';
@@ -427,7 +423,7 @@ class VenteResource extends Resource
                             if ($recu < $net) {
                                 $restant = $net - $recu;
 
-                                return 'Partiel — Reste : ' . number_format($restant, 0, ',', ' ') . ' FCFA';
+                                return 'Partiel, reste : ' . number_format($restant, 0, ',', ' ') . ' FCFA';
                             }
 
                             return 'Payé intégralement';
@@ -589,12 +585,12 @@ class VenteResource extends Resource
                                 $csv .= implode(',', [
                                     $vente->numero_recu,
                                     $vente->date_vente->format('d/m/Y'),
-                                    '"' . ($vente->client?->nom ?? '—') . '"',
-                                    $vente->canal?->getLabel() ?? '—',
+                                    '"' . ($vente->client?->nom ?? '') . '"',
+                                    $vente->canal?->getLabel() ?? '',
                                     (float) $vente->montant_net,
                                     (float) $vente->montant_recu,
                                     (float) $vente->montant_restant,
-                                    $vente->statut_paiement?->getLabel() ?? '—',
+                                    $vente->statut_paiement?->getLabel() ?? '',
                                 ]) . "\n";
                             }
                             echo $csv;

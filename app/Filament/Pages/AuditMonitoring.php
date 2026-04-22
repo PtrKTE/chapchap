@@ -318,7 +318,7 @@ class AuditMonitoring extends Page implements HasTable
                         return DB::table('sessions')
                             ->where('user_id', $record->id)
                             ->orderByDesc('last_activity')
-                            ->value('ip_address') ?? '—';
+                            ->value('ip_address') ?? '';
                     }),
 
                 // Dernière activité depuis la table sessions
@@ -331,7 +331,7 @@ class AuditMonitoring extends Page implements HasTable
                             ->value('last_activity');
 
                         if (! $timestamp) {
-                            return '—';
+                            return '';
                         }
 
                         return Carbon::createFromTimestamp($timestamp)

@@ -1,0 +1,199 @@
+================================================================================
+  SESSION DE TRAVAIL — PROJET CHAPCHAP
+  Date : 29 Mars 2026
+  Sujet : Migration complète XAMPP → MAMP Pro
+================================================================================
+
+
+1. OBJECTIF DE LA SESSION
+--------------------------------------------------------------------------------
+Migrer le projet Laravel CHAPCHAP et sa base de données de XAMPP vers MAMP Pro
+pour bénéficier d'un environnement de développement plus moderne et mieux géré.
+
+
+2. ÉTAT AVANT LA MIGRATION (XAMPP)
+--------------------------------------------------------------------------------
+- Projet           : /Applications/XAMPP/xamppfiles/htdocs/chapchap/
+- Base de données  : MariaDB 10.4.28, port 3306, root sans mot de passe
+- PHP              : 8.4.8 (Homebrew, /usr/local/bin/php)
+- Apache           : port 80, vhost chapchap.local
+- Accès app        : http://localhost:8000 (via php artisan serve)
+
+
+3. ÉTAT APRÈS LA MIGRATION (MAMP Pro)
+--------------------------------------------------------------------------------
+- Projet           : /Applications/MAMP/htdocs/chapchap/
+- Base de données  : MySQL 8.0.44, socket uniquement (skip_networking=ON)
+  - Socket         : /Applications/MAMP/tmp/mysql/mysql.sock
+  - Port config    : 8889 (TCP désactivé, connexion via socket)
+  - User / Pass    : root / root
+- PHP              : 8.4.8 (Homebrew, inchangé)
+- Apache MAMP      : port 8888 (phpMyAdmin accessible)
+- Accès app        : http://localhost:8000 (via php artisan serve)
+- XAMPP            : conservé désactivé comme backup
+
+
+4. ÉTAPES RÉALISÉES
+--------------------------------------------------------------------------------
+
+  [1] Arrêt de XAMPP
+      - Apache XAMPP arrêté via le XAMPP Manager
+      - MySQL XAMPP arrêté via : mysqladmin -u root shutdown
+
+  [2] Export de la base de données depuis XAMPP
+      Commande utilisée :
+        /Applications/XAMPP/xamppfiles/bin/mysqldump \
+          -u root --default-character-set=utf8mb4 \
+          --single-transaction --routines --triggers \
+          chapchap > /tmp/chapchap_backup.sql
+      Résultat : fichier de 140K, export complet (36 tables)
+
+  [3] Copie du projet vers MAMP
+      Commande :
+        cp -R /Applications/XAMPP/xamppfiles/htdocs/chapchap \
+              /Applications/MAMP/htdocs/chapchap
+      Résultat : 142M copiés avec succès
+
+  [4] Démarrage de MAMP Pro
+      - MAMP Pro lancé via l'application
+      - MySQL 8.0 sélectionné, PHP 8.4.17 configuré
+      - Apache sur port 8888, MySQL sur port 8889 (socket only)
+
+  [5] Création et import de la BDD dans MySQL 8.0
+      Commandes :
+        # Connexion MySQL MAMP
+        /Applications/MAMP/Library/bin/mysql80/bin/mysql \
+          -u root -proot --port=8889 \
+          --socket=/Applications/MAMP/tmp/mysql/mysql.sock
+
+        # Créer les bases
+        CREATE DATABASE chapchap CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE DATABASE chapchap_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+        # Importer le dump
+        /Applications/MAMP/Library/bin/mysql80/bin/mysql \
+          -u root -proot --port=8889 \
+          --socket=/Applications/MAMP/tmp/mysql/mysql.sock \
+          chapchap < /tmp/chapchap_backup.sql
+
+      Résultat : 36 tables importées, 1.89MB, 17 produits, 1 utilisateur
+
+  [6] Mise à jour du fichier .env
+      Fichier : /Applications/MAMP/htdocs/chapchap/.env
+
+      Modifications :
+        APP_URL=http://localhost:8000
+        DB_HOST=localhost
+        DB_PORT=8889
+        DB_DATABASE=chapchap
+        DB_USERNAME=root
+        DB_PASSWORD=root
+        DB_SOCKET=/Applications/MAMP/tmp/mysql/mysql.sock
+
+      Clé importante : DB_SOCKET permet à Laravel de se connecter via socket Unix
+      car MySQL MAMP Pro fonctionne en mode skip_networking (TCP désactivé).
+
+  [7] Configuration du PATH système
+      Fichier créé : /Users/patricktetchi/.zshrc
+      Contenu ajouté :
+        export PATH="/Applications/MAMP/Library/bin/mysql80/bin:$PATH"
+        export MYSQL_SOCKET="/Applications/MAMP/tmp/mysql/mysql.sock"
+
+      Résultat :
+        - PHP  : 8.4.8 (Homebrew)   → which php = /usr/local/bin/php
+        - MySQL: 8.0.44 (MAMP)      → which mysql = /Applications/MAMP/.../mysql
+
+  [8] Vidage des caches Laravel
+      Commandes :
+        cd /Applications/MAMP/htdocs/chapchap
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan route:clear
+        php artisan view:clear
+
+  [9] Correction des permissions
+      Commande :
+        chmod -R 775 storage/ bootstrap/cache/
+
+  [10] Tests de vérification
+      - php artisan db:show        → MySQL 8.0.44, 36 tables, 1.89MB ✓
+      - php artisan migrate:status → 28 migrations, toutes "Ran" ✓
+      - php artisan tinker         → 17 produits, 2 emplacements,
+                                     18 catégories charges, 8 rôles,
+                                     210 permissions ✓
+      - Page de login Filament     → HTTP 200 ✓
+
+
+5. PROBLÈME RENCONTRÉ : Virtual Host MAMP Pro
+--------------------------------------------------------------------------------
+Tentative de configuration d'un Virtual Host chapchap.local via MAMP Pro.
+
+  Problème 1 : Le sélecteur de fichiers MAMP Pro ne permettait pas de naviguer
+               en dehors de ~/Sites/ → résolu via Cmd+Shift+G (chemin manuel)
+
+  Problème 2 : MAMP Pro régénère son httpd.conf à chaque redémarrage →
+               les modifications manuelles dans httpd.conf sont écrasées
+
+  Problème 3 : Tentative de symlink ~/Sites/localhost → chapchap/public
+               → Refusé par Apache (AH00037: Symbolic link not allowed)
+
+  Conclusion : Virtual Host abandonné pour le moment.
+  Solution retenue : php artisan serve (standard Laravel, port 8000)
+
+
+6. CONFIGURATION DE TRAVAIL FINALE
+--------------------------------------------------------------------------------
+
+  Pour lancer l'application :
+    cd /Applications/MAMP/htdocs/chapchap
+    php artisan serve
+    → http://localhost:8000/admin/login
+
+  Pour accéder à phpMyAdmin :
+    → http://localhost:8888/phpMyAdmin6/
+    → User: root | Password: root
+
+  Pour se connecter à MySQL en ligne de commande :
+    mysql -u root -proot --socket=/Applications/MAMP/tmp/mysql/mysql.sock
+
+
+7. GESTION MULTI-PROJETS
+--------------------------------------------------------------------------------
+
+  Projets Laravel → ports différents :
+    php artisan serve --port=8000   (chapchap)
+    php artisan serve --port=8001   (projet 2)
+    php artisan serve --port=8002   (projet 3)
+
+  Projets PHP brut → dossiers dans MAMP htdocs :
+    http://localhost:8888/mon-site-php/
+    http://localhost:8888/autre-projet/
+
+
+8. FICHIERS MODIFIÉS / CRÉÉS CETTE SESSION
+--------------------------------------------------------------------------------
+  Modifiés :
+    - /Applications/MAMP/htdocs/chapchap/.env
+
+  Créés :
+    - /Users/patricktetchi/.zshrc
+    - /tmp/chapchap_backup.sql (temporaire, peut être supprimé)
+
+  Non touchés (XAMPP conservé comme backup) :
+    - /Applications/XAMPP/xamppfiles/htdocs/chapchap/ (backup)
+    - /Applications/XAMPP/xamppfiles/var/mysql/       (backup BDD)
+
+
+9. PROCHAINE SESSION
+--------------------------------------------------------------------------------
+  Continuer le développement du projet CHAPCHAP (Phase S2 ou S3) :
+  - S2 : Finir les Models Eloquent + Resources Filament de base
+  - S3 : Module Lots/Achats (CRUD + calculs automatiques)
+
+  Rappel : Toujours travailler dans /Applications/MAMP/htdocs/chapchap/
+  VSCode doit pointer sur ce dossier (et non l'ancien chemin XAMPP).
+
+
+================================================================================
+  FIN DE SESSION
+================================================================================

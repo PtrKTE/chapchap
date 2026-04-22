@@ -52,10 +52,7 @@ class ChargeResource extends Resource
 
             Infolists\Components\Section::make('Compléments')
                 ->schema([
-                    Infolists\Components\TextEntry::make('fournisseur.nom')->label('Fournisseur')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('personne')->label('Personne')->placeholder('—'),
                     Infolists\Components\TextEntry::make('createdBy.name')->label('Saisi par'),
-                    Infolists\Components\TextEntry::make('observations')->label('Observations')->placeholder('—')->columnSpanFull(),
                 ])->columns(3)
                 ->collapsible(),
         ]);
@@ -132,7 +129,7 @@ class ChargeResource extends Resource
                         ->relationship('fournisseur', 'nom')
                         ->searchable()
                         ->preload()
-                        ->helperText('Optionnel — si la charge est liée à un fournisseur'),
+                        ->helperText('Optionnel, si la charge est liée à un fournisseur'),
 
                     // Personne qui a fait la dépense
                     Forms\Components\TextInput::make('personne')
@@ -254,11 +251,11 @@ class ChargeResource extends Resource
                             foreach ($records as $charge) {
                                 $csv .= implode(',', [
                                     $charge->date_charge->format('d/m/Y'),
-                                    '"' . ($charge->categorie?->nom ?? '—') . '"',
+                                    '"' . ($charge->categorie?->nom ?? '') . '"',
                                     '"' . $charge->libelle . '"',
                                     (float) $charge->montant,
-                                    $charge->mode_paiement?->getLabel() ?? '—',
-                                    '"' . ($charge->emplacement?->nom ?? '—') . '"',
+                                    $charge->mode_paiement?->getLabel() ?? '',
+                                    '"' . ($charge->emplacement?->nom ?? '') . '"',
                                 ]) . "\n";
                             }
                             echo $csv;

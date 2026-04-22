@@ -22,7 +22,7 @@ class TopProduitsChart extends ChartWidget
 {
     use WidgetVisibleParProfil;
 
-    protected static ?string $heading = 'Top 5 produits — mois en cours';
+    protected static ?string $heading = 'Top 5 produits : mois en cours';
 
     protected static ?int $sort = 4;
 

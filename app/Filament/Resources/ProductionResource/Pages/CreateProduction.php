@@ -37,6 +37,6 @@ class CreateProduction extends CreateRecord
 
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Production créée — pensez à la valider pour générer le stock';
+        return 'Production créée. Pensez à la valider pour générer le stock.';
     }
 }

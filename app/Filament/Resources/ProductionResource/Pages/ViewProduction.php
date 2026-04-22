@@ -142,7 +142,7 @@ class ViewProduction extends ViewRecord
                     typeMouvement: TypeMouvement::ENTREE_PRODUCTION,
                     lotId:         $lot->id,
                     productionId:  $production->id,
-                    motif:         "Production {$production->reference} — Lot {$lot->reference}",
+                    motif:         "Production {$production->reference} - Lot {$lot->reference}",
                 );
             }
         }

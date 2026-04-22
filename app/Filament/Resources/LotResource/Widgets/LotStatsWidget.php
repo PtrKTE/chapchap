@@ -36,7 +36,7 @@ class LotStatsWidget extends BaseWidget
                 ->color('primary'),
 
             Stat::make('Poulets utilisables', number_format((float) $totalPoulets, 0, ',', ' '))
-                ->description('Ce mois — après pertes et refus')
+                ->description('Ce mois, après pertes et refus')
                 ->icon('heroicon-o-check-circle')
                 ->color('success'),
 

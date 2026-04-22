@@ -52,7 +52,6 @@ class UserResource extends Resource
                 ->schema([
                     Infolists\Components\TextEntry::make('name')->label('Nom complet')->weight('bold'),
                     Infolists\Components\TextEntry::make('email')->label('Email')->copyable(),
-                    Infolists\Components\TextEntry::make('telephone')->label('Téléphone')->placeholder('—'),
                     Infolists\Components\TextEntry::make('profil')->label('Profil')->badge()
                         ->color(fn (Profil $state) => match ($state) {
                             Profil::GERANT => 'danger',
@@ -61,7 +60,6 @@ class UserResource extends Resource
                             Profil::AGENT_PRODUCTION => 'success',
                             Profil::COMMERCIAL, Profil::POINT_DE_VENTE => 'primary',
                         }),
-                    Infolists\Components\TextEntry::make('emplacement.nom')->label('Emplacement')->icon('heroicon-o-map-pin')->placeholder('—'),
                     Infolists\Components\IconEntry::make('actif')->label('Actif')->boolean(),
                 ])->columns(3),
 

@@ -76,7 +76,7 @@ class ViewLot extends ViewRecord
 
                     Notification::make()
                         ->title('Règlement enregistré')
-                        ->body(number_format($montantVerse, 0, ',', ' ') . ' FCFA enregistrés — Statut : ' . $statut->getLabel())
+                        ->body(number_format($montantVerse, 0, ',', ' ') . ' FCFA enregistrés. Statut : ' . $statut->getLabel())
                         ->success()
                         ->send();
                 }),

@@ -39,10 +39,7 @@ class EauProductionResource extends Resource
                 ->schema([
                     Infolists\Components\TextEntry::make('date_production')->label('Date')->date('d/m/Y')->weight('bold'),
                     Infolists\Components\TextEntry::make('nb_paquets_produits')->label('Paquets produits')->numeric(0)->suffix(' paquets')->weight('bold')->color('primary'),
-                    Infolists\Components\TextEntry::make('consommation_sachets')->label('Sachets utilisés')->numeric(0)->placeholder('—'),
-                    Infolists\Components\TextEntry::make('consommation_energie')->label('Énergie')->numeric(2)->suffix(' kWh')->placeholder('—'),
                     Infolists\Components\TextEntry::make('createdBy.name')->label('Saisi par'),
-                    Infolists\Components\TextEntry::make('observations')->label('Observations')->placeholder('—')->columnSpanFull(),
                 ])->columns(3),
         ]);
     }

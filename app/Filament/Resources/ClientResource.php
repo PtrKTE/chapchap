@@ -48,20 +48,12 @@ class ClientResource extends Resource
                     Infolists\Components\TextEntry::make('code')->label('Code')->weight('bold')->copyable(),
                     Infolists\Components\TextEntry::make('nom')->label('Nom / Raison sociale')->weight('bold'),
                     Infolists\Components\TextEntry::make('type_client')->label('Type')->badge(),
-                    Infolists\Components\TextEntry::make('telephone')->label('Téléphone')->icon('heroicon-o-phone')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('email')->label('Email')->icon('heroicon-o-envelope')->placeholder('—'),
                     Infolists\Components\IconEntry::make('actif')->label('Actif')->boolean(),
                 ])->columns(3),
 
             Infolists\Components\Section::make('Localisation & Commercial')
                 ->icon('heroicon-o-map-pin')
                 ->schema([
-                    Infolists\Components\TextEntry::make('adresse')->label('Adresse')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('quartier_zone')->label('Quartier / Zone')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('commercial.name')->label('Commercial')->icon('heroicon-o-briefcase')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('mode_paiement_habituel')->label('Mode paiement')->badge()->placeholder('—'),
-                    Infolists\Components\TextEntry::make('contact_principal')->label('Contact')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('conditions_paiement')->label('Conditions')->placeholder('—'),
                 ])->columns(3)
                 ->collapsible(),
 
@@ -258,10 +250,10 @@ class ClientResource extends Resource
                                 $csv .= implode(',', [
                                     $client->code,
                                     '"' . $client->nom . '"',
-                                    $client->telephone ?? '—',
-                                    $client->type_client?->getLabel() ?? '—',
-                                    '"' . ($client->quartier_zone ?? '—') . '"',
-                                    '"' . ($client->commercial?->name ?? '—') . '"',
+                                    $client->telephone ?? '',
+                                    $client->type_client?->getLabel() ?? '',
+                                    '"' . ($client->quartier_zone ?? '') . '"',
+                                    '"' . ($client->commercial?->name ?? '') . '"',
                                     $client->actif ? 'Oui' : 'Non',
                                 ]) . "\n";
                             }

@@ -64,7 +64,6 @@ class ProductionResource extends Resource
                         ->label('')
                         ->schema([
                             Infolists\Components\TextEntry::make('produit.nom')->label('Produit')->weight('bold'),
-                            Infolists\Components\TextEntry::make('quantite_unite')->label('Qté (unités)')->numeric(0)->placeholder('—'),
                             Infolists\Components\TextEntry::make('quantite')->label('Qté (kg)')->numeric(3)->suffix(' kg'),
                             Infolists\Components\TextEntry::make('cout_unitaire_calcule')->label('Coût unit.')->numeric(2)->suffix(' FCFA'),
                             Infolists\Components\TextEntry::make('valeur_totale')->label('Valeur')->numeric(0)->suffix(' FCFA')->color('primary'),
@@ -73,9 +72,6 @@ class ProductionResource extends Resource
 
             Infolists\Components\Section::make('Validation')
                 ->schema([
-                    Infolists\Components\TextEntry::make('validePar.name')->label('Validé par')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('date_validation')->label('Date validation')->dateTime('d/m/Y H:i')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('observations')->label('Observations')->placeholder('—')->columnSpanFull(),
                 ])->columns(2)
                 ->collapsible(),
         ]);
@@ -108,7 +104,7 @@ class ProductionResource extends Resource
                                 ->where('quantite_utilisable', '>', 0)
                                 ->get()
                                 ->mapWithKeys(fn(Lot $lot) => [
-                                    $lot->id => "{$lot->reference} — {$lot->quantite_utilisable} poulets dispo (CMP: " . number_format((float) $lot->cout_moyen_unitaire, 0, ',', ' ') . " FCFA)",
+                                    $lot->id => "{$lot->reference} : {$lot->quantite_utilisable} poulets dispo (CMP: " . number_format((float) $lot->cout_moyen_unitaire, 0, ',', ' ') . " FCFA)",
                                 ]);
                         })
                         ->required()
@@ -132,7 +128,7 @@ class ProductionResource extends Resource
                             }
                             $lot = Lot::find($lotId);
                             if (! $lot) {
-                                return '—';
+                                return '';
                             }
 
                             return "Fournisseur : {$lot->fournisseur->nom} | Reçu : {$lot->quantite_recue} | Utilisable : {$lot->quantite_utilisable} | CMP : " . number_format((float) $lot->cout_moyen_unitaire, 2, ',', ' ') . ' FCFA';
@@ -188,7 +184,7 @@ class ProductionResource extends Resource
 
             // Section 2b : Répartition pour le calcul automatique
             Forms\Components\Section::make('Répartition des poulets')
-                ->description('Indiquez combien de poulets effilés et PAC vous produisez — le reste sera considéré comme découpe')
+                ->description('Indiquez combien de poulets effilés et PAC vous produisez, le reste sera considéré comme découpe')
                 ->schema([
                     Forms\Components\TextInput::make('nb_effil_form')
                         ->label('Dont poulets effilés')

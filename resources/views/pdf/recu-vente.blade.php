@@ -121,7 +121,7 @@
         @endif
         <div class="nom">CHAP-CHAP</div>
         <div class="sub">Boucherie & Transformation de Volailles</div>
-        <div class="tel">Abidjan, Côte d'Ivoire — Tél: 07 00 00 00 00</div>
+        <div class="tel">Abidjan, Côte d'Ivoire - Tél: 07 00 00 00 00</div>
     </div>
 
     {{-- NUMÉRO REÇU --}}
@@ -135,11 +135,11 @@
             @if ($vente->client?->telephone)
             <tr><td class="lbl">Tél :</td><td>{{ $vente->client->telephone }}</td></tr>
             @endif
-            <tr><td class="lbl">Canal :</td><td>{{ $vente->canal?->getLabel() ?? '—' }}</td></tr>
+            <tr><td class="lbl">Canal :</td><td>{{ $vente->canal?->getLabel() ?? '' }}</td></tr>
             @if ($vente->commercial)
             <tr><td class="lbl">Vendeur :</td><td>{{ $vente->commercial->name }}</td></tr>
             @endif
-            <tr><td class="lbl">Site :</td><td>{{ $vente->emplacement?->nom ?? '—' }}</td></tr>
+            <tr><td class="lbl">Site :</td><td>{{ $vente->emplacement?->nom ?? '' }}</td></tr>
         </table>
     </div>
 
@@ -158,7 +158,7 @@
         <tbody>
             @foreach ($vente->lignes as $ligne)
             <tr>
-                <td class="nom">{{ $ligne->produit?->nom ?? '—' }}</td>
+                <td class="nom">{{ $ligne->produit?->nom ?? '' }}</td>
                 <td class="r">{{ number_format((float) $ligne->quantite, 2, ',', '') }}</td>
                 <td class="r">{{ number_format((float) $ligne->prix_unitaire, 0, ' ', ' ') }}</td>
                 <td class="r">{{ number_format((float) $ligne->montant_ligne, 0, ' ', ' ') }}</td>
@@ -197,7 +197,7 @@
         @endif
         <tr>
             <td class="lbl">Paiement :</td>
-            <td class="val">{{ $vente->mode_paiement?->getLabel() ?? '—' }}</td>
+            <td class="val">{{ $vente->mode_paiement?->getLabel() ?? '' }}</td>
         </tr>
     </table>
 

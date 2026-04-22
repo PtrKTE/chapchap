@@ -22,7 +22,7 @@ class TopClientsChart extends ChartWidget
 {
     use WidgetVisibleParProfil;
 
-    protected static ?string $heading = 'Top 5 clients — mois en cours';
+    protected static ?string $heading = 'Top 5 clients : mois en cours';
 
     protected static ?int $sort = 3;
 

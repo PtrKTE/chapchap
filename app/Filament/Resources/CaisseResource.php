@@ -66,7 +66,6 @@ class CaisseResource extends Resource
                     Infolists\Components\TextEntry::make('montant_especes')->label('Espèces en caisse')->numeric(0)->suffix(' FCFA'),
                     Infolists\Components\TextEntry::make('ecart')->label('Écart')->numeric(0)->suffix(' FCFA')->weight('bold')
                         ->color(fn($state) => abs((float) $state) < 1 ? 'success' : 'danger'),
-                    Infolists\Components\TextEntry::make('observations')->label('Observations')->placeholder('—')->columnSpanFull(),
                 ])->columns(4)
                 ->collapsible(),
         ]);

@@ -51,13 +51,12 @@ class LotResource extends Resource
                 ->icon('heroicon-o-calculator')
                 ->schema([
                     Infolists\Components\TextEntry::make('quantite_recue')->label('Qté reçue')->numeric(0),
-                    Infolists\Components\TextEntry::make('poids_total_lot')->label('Poids total lot')->numeric(3)->suffix(' kg')->placeholder('—'),
                     Infolists\Components\TextEntry::make('poids_total_lot')
                         ->label('Poids moyen / poulet')
                         ->formatStateUsing(function ($state, $record): string {
                             $recue = (int) ($record->quantite_recue ?? 0);
                             $poids = (float) ($state ?? 0);
-                            if ($poids <= 0 || $recue <= 0) return '—';
+                            if ($poids <= 0 || $recue <= 0) return '';
                             return number_format($poids / $recue, 3, ',', ' ') . ' kg';
                         }),
                     Infolists\Components\TextEntry::make('quantite_morts')->label('Morts (PM)')->numeric(0)->color('danger'),
@@ -90,9 +89,6 @@ class LotResource extends Resource
                     Infolists\Components\TextEntry::make('montant_facture')->label('Montant facture')->numeric(0)->suffix(' FCFA'),
                     Infolists\Components\TextEntry::make('montant_regle')->label('Montant réglé')->numeric(0)->suffix(' FCFA')->color('success'),
                     Infolists\Components\TextEntry::make('statut_facture')->label('Statut')->badge(),
-                    Infolists\Components\TextEntry::make('mode_reglement')->label('Mode')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('date_reglement')->label('Date règlement')->date('d/m/Y')->placeholder('—'),
-                    Infolists\Components\TextEntry::make('observations')->label('Observations')->placeholder('—')->columnSpanFull(),
                 ])->columns(4)
                 ->collapsible(),
         ]);
@@ -180,7 +176,7 @@ class LotResource extends Resource
                             $poids = (float) ($get('poids_total_lot') ?? 0);
                             $recue = (int) ($get('quantite_recue') ?? 0);
                             if ($poids <= 0 || $recue <= 0) {
-                                return '—';
+                                return '';
                             }
                             return number_format($poids / $recue, 3, ',', ' ') . ' kg/poulet';
                         })
@@ -261,7 +257,7 @@ class LotResource extends Resource
                             $coutTotal  = static::calculerCoutTotal($get);
                             $utilisable = static::calculerQuantiteUtilisable($get);
                             if ($utilisable <= 0) {
-                                return '—';
+                                return '';
                             }
                             return number_format($coutTotal / $utilisable, 2, ',', ' ') . ' FCFA';
                         }),
@@ -292,7 +288,7 @@ class LotResource extends Resource
                         ->suffix('FCFA')
                         ->live(onBlur: true)
                         ->afterStateUpdated(fn(Get $get, Set $set) => static::calculerStatutFacture($get, $set))
-                        ->helperText('Pré-rempli avec le coût qté utilisable — modifiable manuellement'),
+                        ->helperText('Pré-rempli avec le coût qté utilisable, modifiable manuellement'),
                     Forms\Components\TextInput::make('montant_regle')
                         ->label('Montant réglé (FCFA)')
                         ->numeric()
@@ -313,7 +309,7 @@ class LotResource extends Resource
                             $facture = (float) ($get('montant_facture') ?? 0);
                             $regle = (float) ($get('montant_regle') ?? 0);
                             if ($facture <= 0) {
-                                return '—';
+                                return '';
                             }
                             if ($regle <= 0) {
                                 return '🔴 Non réglée';
@@ -473,13 +469,13 @@ class LotResource extends Resource
                                 $csv .= implode(',', [
                                     $lot->reference,
                                     $lot->date_reception->format('d/m/Y'),
-                                    '"' . ($lot->fournisseur?->nom ?? '—') . '"',
+                                    '"' . ($lot->fournisseur?->nom ?? '') . '"',
                                     $lot->type_produit,
                                     $lot->quantite_recue,
                                     $lot->quantite_utilisable,
                                     (float) $lot->cout_total,
                                     (float) $lot->cout_moyen_unitaire,
-                                    $lot->statut_facture?->getLabel() ?? '—',
+                                    $lot->statut_facture?->getLabel() ?? '',
                                 ]) . "\n";
                             }
                             echo $csv;

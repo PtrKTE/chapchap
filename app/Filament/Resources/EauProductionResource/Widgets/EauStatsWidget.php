@@ -46,7 +46,7 @@ class EauStatsWidget extends StatsOverviewWidget
         // Rendement moyen sachets → paquets
         $rendement = $sachetsMois > 0
             ? round(($paquetsMois / $sachetsMois) * 100, 1) . '%'
-            : '—';
+            : '';
 
         return [
             Stat::make('Production ce mois', number_format($paquetsMois, 0, ',', ' ') . ' paquets')
