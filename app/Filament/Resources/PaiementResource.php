@@ -69,7 +69,7 @@ class PaiementResource extends Resource
                         ->badge(),
 
                     Infolists\Components\TextEntry::make('reference_paiement')
-                        ->label('Référence')
+                        ->label('Référence'),
 
                     Infolists\Components\TextEntry::make('observations')
                         ->label('Observations')

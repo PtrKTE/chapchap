@@ -53,7 +53,7 @@ class ProductionResource extends Resource
                     Infolists\Components\TextEntry::make('poids_total_entrant')->label('Poids total')->numeric(1)->suffix(' kg'),
                     Infolists\Components\TextEntry::make('pertes_casse')->label('Pertes/casse')->numeric(1)->suffix(' kg')->color('danger'),
                     Infolists\Components\TextEntry::make('rendement')->label('Rendement')
-                        ->formatStateUsing(fn($state) => $state ? number_format((float) $state * 100, 1) . ' %' : '—')
+                        ->formatStateUsing(fn($state) => $state ? number_format((float) $state * 100, 1) . ' %' : '')
                         ->color(fn($state) => $state && (float) $state > 0.8 ? 'success' : 'warning'),
                 ])->columns(5),
 
@@ -399,7 +399,7 @@ class ProductionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('rendement')
                     ->label('Rendement')
-                    ->formatStateUsing(fn($state) => $state ? number_format((float) $state * 100, 1) . ' %' : '—')
+                    ->formatStateUsing(fn($state) => $state ? number_format((float) $state * 100, 1) . ' %' : '')
                     ->visibleFrom('md'),
                 Tables\Columns\TextColumn::make('statut')
                     ->label('Statut')

@@ -157,7 +157,7 @@ class VenteResource extends Resource
 
                     Infolists\Components\TextEntry::make('mode_paiement')
                         ->label('Mode de paiement')
-                        ->badge()
+                        ->badge(),
 
                     Infolists\Components\TextEntry::make('date_reglement_complet')
                         ->label('Date règlement complet')

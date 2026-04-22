@@ -32,7 +32,7 @@ class ProductionStatsWidget extends BaseWidget
                 ->icon('heroicon-o-check-circle')
                 ->color('success'),
 
-            Stat::make('Rendement moyen', $rendementMoyen ? number_format((float) $rendementMoyen * 100, 1) . ' %' : '—')
+            Stat::make('Rendement moyen', $rendementMoyen ? number_format((float) $rendementMoyen * 100, 1) . ' %' : '')
                 ->description('Valorisation / coût matière')
                 ->icon('heroicon-o-chart-bar')
                 ->color((float) $rendementMoyen > 1 ? 'success' : 'warning'),
